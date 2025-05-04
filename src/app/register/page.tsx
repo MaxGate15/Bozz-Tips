@@ -2,8 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterPage() {
+  
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -22,7 +25,34 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement registration logic
-    console.log('Registration attempt with:', formData);
+    try {
+      const response = await fetch('https://wonit-backend.onrender.com/api/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        setFormData({
+          name: '',
+          confirmPassword: '',
+          email: '',
+          password: '',
+        });
+        
+        navigate('/login');
+      } else {
+        // Show specific error from the server
+        alert(data.error || 'Signup failed. Please check your inputs.');
+      }
+    } catch (error) {
+      console.error('Error during signup:', error);
+      alert('Network error. Please try again.');
+    }
   };
 
   return (

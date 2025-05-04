@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, } from 'react';
+import { useLocation,useNavigate } from 'react-router-dom';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import axios from 'axios';
+import { saveToken, saveEmail } from '../utils/auth'; // Adjust the import path as necessary
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -12,27 +14,32 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const location = useLocation();
+  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
+    const userDetails = {
+      email: email,
+      password: password,
+    };
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else {
-        router.push('/');
-      }
+      const response = await axios.post('https://wonit-backend.onrender.com/api/token/', userDetails);
+      const { access } = response.data;
+  
+      saveToken(access);
+      saveEmail(userDetails.email);
+  
+      const redirectTo = location.state?.from || '/';
+      
+      
+      window.location.reload(); 
     } catch (error) {
-      setError('An error occurred during sign in');
-    } finally {
+      console.error('Login failed:', error);
+      alert('Invalid credentials');
+    }finally {
       setIsLoading(false);
     }
   };
