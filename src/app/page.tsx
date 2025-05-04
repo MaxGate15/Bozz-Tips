@@ -1,8 +1,32 @@
-import Image from "next/image";
+'use client'
 import Link from "next/link";
-import { motion } from "framer-motion";
+import React,{ useState,useEffect } from "react";
+import axios from "axios";
 
-export default function Home() {
+const Home:React.FC =() =>{
+  type Game = {
+    game_id: number;
+    date_created: string;
+    time_created: string;
+    game_type: string;
+    team1: string;
+    team2: string;
+    prediction: string;
+  }
+  const [games, setGames] = useState<Game[]>([]);
+  useEffect(() => {
+  async function fetchGames():Promise<void> {
+    try {
+      const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/games");
+      setGames(response.data);
+    } catch (error) {
+      console.error("Error fetching games:", error);
+    }
+
+  }
+  fetchGames();
+},[])
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -55,7 +79,8 @@ export default function Home() {
           
           {/* Predictions List */}
           <div className="max-w-4xl mx-auto">
-            {[
+            {
+            [
               {
                 date: "01/05",
                 time: "11:30 AM",
@@ -205,3 +230,5 @@ export default function Home() {
     </div>
   );
 }
+
+export default Home;
