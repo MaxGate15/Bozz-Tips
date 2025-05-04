@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, } from 'react';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -14,8 +13,6 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const location = useLocation();
-  const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,10 +29,8 @@ export default function LoginPage() {
       saveToken(access);
       saveEmail(userDetails.email);
   
-      const redirectTo = location.state?.from || '/';
-      
-      
-      window.location.reload(); 
+      router.push('/');
+      // window.location.reload(); // Optional: only if you need a full reload
     } catch (error) {
       console.error('Login failed:', error);
       alert('Invalid credentials');

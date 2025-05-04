@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   
-  const navigate = useNavigate();
+  const router = useRouter();
   const [formData, setFormData] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -26,7 +26,7 @@ export default function RegisterPage() {
     e.preventDefault();
     // TODO: Implement registration logic
     try {
-      const response = await fetch('https://wonit-backend.onrender.com/api/signup', {
+      const response = await fetch('https://wonit-backend.onrender.com/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,13 +38,13 @@ export default function RegisterPage() {
   
       if (response.ok) {
         setFormData({
-          name: '',
+          username: '',
           confirmPassword: '',
           email: '',
           password: '',
         });
         
-        navigate('/login');
+        router.push('/login');
       } else {
         // Show specific error from the server
         alert(data.error || 'Signup failed. Please check your inputs.');
@@ -69,16 +69,16 @@ export default function RegisterPage() {
           <div className="p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Full Name
+                <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                  Username
                 </label>
                 <input
-                  id="name"
-                  name="name"
+                  id="username"
+                  name="username"
                   type="text"
-                  autoComplete="name"
+                  autoComplete="username"
                   required
-                  value={formData.name}
+                  value={formData.username}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
