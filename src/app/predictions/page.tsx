@@ -13,6 +13,7 @@ const PredictionsPage:React.FC = () => {
     team2: string;
     prediction: string;
 }
+
 const [selectedDate, setSelectedDate] = useState(new Date());
 const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 const [games, setGames] = useState<Game[]>([])
