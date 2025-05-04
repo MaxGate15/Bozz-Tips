@@ -17,7 +17,7 @@ const Home:React.FC =() =>{
   useEffect(() => {
   async function fetchGames():Promise<void> {
     try {
-      const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/games");
+      const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
       setGames(response.data);
     } catch (error) {
       console.error("Error fetching games:", error);
