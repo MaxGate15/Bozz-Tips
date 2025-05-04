@@ -1,45 +1,94 @@
 'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
+import React,{ useState,useEffect } from 'react';
+import axios from 'axios';
 
-export default function PredictionsPage() {
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+const PredictionsPage:React.FC = () => {
+  type Game = {
+    game_id: number;
+    date_created: string;
+    time_created: string;
+    game_type: string;
+    team1: string;
+    team2: string;
+    prediction: string;
+}
+const [selectedDate, setSelectedDate] = useState(new Date());
+const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+const [games, setGames] = useState<Game[]>([])
+const [day, setDay] = useState('today');
+useEffect(() => {
+  async function fetchGames(): Promise<void> {
+    try {
+      let response;
 
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+      if (day === 'today') {
+        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games/");
+      } else if (day === 'yesterday') {
+        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/yesterday-games");
+      } else if (day === 'tomorrow') {
+        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/tomorrow-games");
+      } else {
+        const formattedDate = formatDateForInput(selectedDate);
+        response = await axios.get<Game[]>(`https://wonit-backend.onrender.com/other-games?formattedDate=${formattedDate}`);
+      }
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value);
-    setSelectedDate(newDate);
-    setIsDatePickerOpen(false);
-  };
+      const gamesData = response.data || response.data;
+      setGames(gamesData);
+      console.log(gamesData);
+    } catch (error) {
+      console.error("Error fetching games:", error);
+    }
+  }
 
-  const goToYesterday = () => {
-    const yesterday = new Date(selectedDate);
-    yesterday.setDate(selectedDate.getDate() - 1);
-    setSelectedDate(yesterday);
-  };
+  fetchGames();
+}, [day, selectedDate]);
 
-  const goToTomorrow = () => {
-    const tomorrow = new Date(selectedDate);
-    tomorrow.setDate(selectedDate.getDate() + 1);
-    setSelectedDate(tomorrow);
-  };
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
 
-  const formatDateForInput = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
+const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const newDate = new Date(e.target.value);
+  setSelectedDate(newDate);
+  setIsDatePickerOpen(false);
+};
+
+const goToYesterday = () => {
+  const yesterday = new Date(selectedDate);
+  yesterday.setDate(selectedDate.getDate() - 1);
+  setSelectedDate(yesterday);
+  setDay('yesterday');
+  
+};
+
+const goToTomorrow = () => {
+  const tomorrow = new Date(selectedDate);
+  tomorrow.setDate(selectedDate.getDate() + 1);
+  setDay('tomorrow');
+  setSelectedDate(tomorrow);
+  
+};
+const goToToday = () => {
+  const today = new Date();
+  setSelectedDate(today);
+  setDay('today');
+};
+
+const formatDateForInput = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const formattedDate = `${year}-${month}-${day}`;
+  setDay('other');
+
+  return formattedDate;
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -60,7 +109,7 @@ export default function PredictionsPage() {
             Yesterday
           </button>
           <button 
-            onClick={() => setSelectedDate(new Date())}
+            onClick={goToToday}
             className="px-8 py-2 rounded-full border border-blue-500 bg-blue-500 text-white"
           >
             Today
@@ -104,139 +153,18 @@ export default function PredictionsPage() {
 
         {/* Free Predictions List */}
         <div className="max-w-4xl mx-auto space-y-4 mb-12">
-          {[
-            {
-              date: "01/05",
-              time: "11:30 AM",
-              type: "Over/Under",
-              team1: "Royal Antwerp FC",
-              team2: "RSC Anderlecht",
-              prediction: "Under 4.5"
-            },
-            {
-              date: "01/05",
-              time: "11:00 AM",
-              type: "Double Chance",
-              team1: "Henan",
-              team2: "Wuhan Three Towns FC",
-              prediction: "Home or Draw"
-            },
-            {
-              date: "01/05",
-              time: "11:00 AM",
-              type: "Over/Under",
-              team1: "Zhejiang FC",
-              team2: "Changchun Yatai",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "11:35 AM",
-              type: "Over/Under",
-              team1: "Shandong Taishan FC",
-              team2: "Qingdao Hainiu FC",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "11:35 AM",
-              type: "Over/Under",
-              team1: "Shanghai Port FC",
-              team2: "Beijing Guoan",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "12:00 PM",
-              type: "Over/Under",
-              team1: "Coventry City U21",
-              team2: "Crewe Alexandra U21",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "15:00 PM",
-              type: "Double Chance",
-              team1: "Palermo FC",
-              team2: "FC Sudtirol Bolzano",
-              prediction: "Home or Draw"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "Double Chance",
-              team1: "Modena FC",
-              team2: "Reggiana",
-              prediction: "Home or Draw"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "Over/Under",
-              team1: "Club Brugge",
-              team2: "Gent",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "Over/Under",
-              team1: "Djurgarden IF",
-              team2: "Chelsea",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "1X2 - 1XF",
-              team1: "Betis",
-              team2: "Fiorentina",
-              prediction: "Home"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "Over/Under",
-              team1: "Tottenham",
-              team2: "Bodø/Glimt",
-              prediction: "Over 2.5"
-            },
-            {
-              date: "01/05",
-              time: "20:00 PM",
-              type: "Handicap 0:2",
-              team1: "Athletic Bilbao",
-              team2: "Man Utd",
-              prediction: "Away 0:2"
-            },
-            {
-              date: "01/05",
-              time: "20:45 PM",
-              type: "Double Chance",
-              team1: "Nottingham Forest",
-              team2: "Brentford FC",
-              prediction: "Home or Away"
-            },
-            {
-              date: "01/05",
-              time: "20:45 PM",
-              type: "Over/Under",
-              team1: "Viborg FF",
-              team2: "Copenhagen",
-              prediction: "Over 2.5"
-            }
-          ].map((match, index) => (
+          {games.map((match, index) => (
             <div 
               key={index}
               className="bg-white p-6 flex items-center justify-between hover:shadow-md transition-shadow rounded-lg border border-gray-100"
             >
               <div className="flex items-center space-x-8">
                 <div className="w-24 text-blue-600">
-                  <div className="font-semibold">{match.date}</div>
-                  <div className="text-sm">{match.time}</div>
+                  <div className="font-semibold">{match.date_created}</div>
+                  <div className="text-sm">{match.time_created}</div>
                 </div>
                 <div>
-                  <div className="text-gray-500 text-sm mb-1">{match.type}</div>
+                  <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
                   <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
                 </div>
               </div>
@@ -499,3 +427,5 @@ export default function PredictionsPage() {
     </div>
   );
 } 
+
+export default PredictionsPage;
