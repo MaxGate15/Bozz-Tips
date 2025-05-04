@@ -34,7 +34,7 @@ useEffect(() => {
         response = await axios.get<Game[]>(`https://wonit-backend.onrender.com/other-games?formattedDate=${formattedDate}`);
       }
 
-      const gamesData = response.data || response.data;
+      const gamesData = response.data 
       setGames(gamesData);
       console.log(gamesData);
     } catch (error) {
@@ -57,8 +57,10 @@ const formatDate = (date: Date) => {
 const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   const newDate = new Date(e.target.value);
   setSelectedDate(newDate);
+  setDay('other'); // ✅ Move this here
   setIsDatePickerOpen(false);
 };
+
 
 const goToYesterday = () => {
   const yesterday = new Date(selectedDate);
@@ -85,11 +87,9 @@ const formatDateForInput = (date: Date) => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');
-  const formattedDate = `${year}-${month}-${day}`;
-  setDay('other');
-
-  return formattedDate;
+  return `${year}-${month}-${day}`;
 };
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -103,24 +103,27 @@ const formatDateForInput = (date: Date) => {
       <div className="container mx-auto px-4 py-8">
         {/* Date Navigation */}
         <div className="flex justify-center space-x-4 mb-8">
+        <button 
+  onClick={goToYesterday}
+  className={`px-8 py-2 rounded-full border ${day === 'yesterday' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+>
+  Yesterday
+</button>
+
           <button 
-            onClick={goToYesterday}
-            className="px-8 py-2 rounded-full border border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white transition-colors"
-          >
-            Yesterday
-          </button>
-          <button 
-            onClick={goToToday}
-            className="px-8 py-2 rounded-full border border-blue-500 bg-blue-500 text-white"
-          >
-            Today
-          </button>
-          <button 
-            onClick={goToTomorrow}
-            className="px-8 py-2 rounded-full border border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white transition-colors"
-          >
-            Tomorrow
-          </button>
+  onClick={goToToday}
+  className={`px-8 py-2 rounded-full border ${day === 'today' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+>
+  Today
+</button>
+
+<button 
+  onClick={goToTomorrow}
+  className={`px-8 py-2 rounded-full border ${day === 'tomorrow' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+>
+  Tomorrow
+</button>
+
           
           <button
             onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
