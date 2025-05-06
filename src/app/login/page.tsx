@@ -5,10 +5,11 @@ import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
-import { saveToken, saveEmail } from '../utils/auth'; // Adjust the import path as necessary
+import { saveToken, saveUsername } from '../utils/auth'; // Adjust the import path as necessary
+import { u } from 'framer-motion/client';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -19,7 +20,7 @@ export default function LoginPage() {
     setError('');
     setIsLoading(true);
     const userDetails = {
-      email: email,
+      username: username,
       password: password,
     };
     try {
@@ -27,7 +28,7 @@ export default function LoginPage() {
       const { access } = response.data;
   
       saveToken(access);
-      saveEmail(userDetails.email);
+      saveUsername(userDetails.username); // Save username to local storage
   
       router.push('/');
       // window.location.reload(); // Optional: only if you need a full reload
@@ -90,19 +91,19 @@ export default function LoginPage() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
               />
             </div>
 
