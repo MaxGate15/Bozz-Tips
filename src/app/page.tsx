@@ -26,6 +26,7 @@ const Home:React.FC =() =>{
   }
   fetchGames();
 },[])
+
   
   return (
     <div className="min-h-screen">
