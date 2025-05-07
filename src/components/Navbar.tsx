@@ -1,12 +1,26 @@
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
+import { getUsername } from '../app/utils/auth';
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { data: session } = useSession();
+  const [localUsername, setLocalUsername] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (!session) {
+      const username = getUsername();
+      setLocalUsername(username);
+      console.log('Navbar mounted, username from localStorage:', username);
+    } else {
+      console.log('Navbar mounted, session user:', session.user?.name);
+    }
+  }, [session]);
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
@@ -46,7 +60,7 @@ export default function Navbar() {
                       {session.user?.name?.[0] || 'U'}
                     </div>
                   )}
-                  <span>{session.user?.name}</span>
+                  <span>{mounted ? (session.user?.name || localUsername || 'User') : ''}</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>

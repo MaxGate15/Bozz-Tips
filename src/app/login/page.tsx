@@ -30,8 +30,10 @@ export default function LoginPage() {
       saveToken(access);
       saveUsername(userDetails.username); // Save username to local storage
   
+      console.log('Login successful, redirecting to home page');
+      alert('Login successful! Redirecting to home page...');
       router.push('/');
-      // window.location.reload(); // Optional: only if you need a full reload
+      window.location.reload();
     } catch (error) {
       console.error('Login failed:', error);
       alert('Invalid credentials');

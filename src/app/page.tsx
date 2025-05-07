@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React,{ useState,useEffect } from "react";
 import axios from "axios";
+import { getUsername, getToken } from './utils/auth';
 
 const Home:React.FC =() =>{
   type Game = {
@@ -14,18 +15,24 @@ const Home:React.FC =() =>{
     prediction: string;
   }
   const [games, setGames] = useState<Game[]>([]);
+  const [debugUsername, setDebugUsername] = useState<string | null>(null);
+  const [debugToken, setDebugToken] = useState<string | null>(null);
   useEffect(() => {
-  async function fetchGames():Promise<void> {
-    try {
-      const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
-      setGames(response.data);
-    } catch (error) {
-      console.error("Error fetching games:", error);
+    async function fetchGames():Promise<void> {
+      try {
+        const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
+        setGames(response.data);
+      } catch (error) {
+        console.error("Error fetching games:", error);
+      }
     }
+    fetchGames();
+  },[])
 
-  }
-  fetchGames();
-},[])
+  useEffect(() => {
+    setDebugUsername(getUsername());
+    setDebugToken(getToken());
+  }, []);
   
   return (
     <div className="min-h-screen">
@@ -227,6 +234,13 @@ const Home:React.FC =() =>{
           </div>
         </div>
       </section>
+
+      {/* Debug Info */}
+      <div style={{ background: '#fee', color: '#900', padding: '1rem', margin: '1rem 0', borderRadius: '8px' }}>
+        <strong>Debug Info:</strong><br />
+        Username in localStorage: {debugUsername || 'null'}<br />
+        Token in localStorage: {debugToken || 'null'}
+      </div>
     </div>
   );
 }

@@ -5,18 +5,28 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getUsername } from '../utils/auth';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState(new Date('2025-05-01'));
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [localUsername, setLocalUsername] = useState<string | null>(null);
+  const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/login');
     }
-  }, [status, router]);
+    // Get username from local storage if session is not available
+    if (!session) {
+      setLocalUsername(getUsername());
+    }
+    if (status !== 'loading') {
+      setVisible(true);
+    }
+  }, [status, router, session]);
 
   const handleDateChange = (date: Date | null) => {
     if (date) {
@@ -34,7 +44,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}>
       {/* Black Header */}
       <div className="bg-black py-6">
         <div className="container mx-auto px-4 flex justify-between items-center">
@@ -82,7 +92,7 @@ export default function DashboardPage() {
             )}
             <div>
               <h2 className="text-2xl font-bold text-gray-900">
-                Welcome back, {session?.user?.name || 'User'}!
+                Welcome back, {session?.user?.name || localUsername || 'User'}!
               </h2>
               <p className="text-gray-600">{session?.user?.email}</p>
             </div>
