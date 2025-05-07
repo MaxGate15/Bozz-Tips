@@ -27,13 +27,10 @@ const Home:React.FC =() =>{
       }
     }
     fetchGames();
-  },[])
-
-  useEffect(() => {
     setDebugUsername(getUsername());
     setDebugToken(getToken());
-  }, []);
-  
+  },[])
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}

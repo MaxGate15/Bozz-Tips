@@ -1,66 +1,78 @@
 'use client';
+
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
-import { useSession, signOut } from 'next-auth/react';
-import { getUsername } from '../app/utils/auth';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import {
+  getUsername,
+  isAuthenticated,
+  removeToken,
+  removeUsername,
+  removeIsAuthenticated,
+} from '../app/utils/auth'; // adjust path if necessary
+import { u } from 'framer-motion/client';
 
 export default function Navbar() {
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { data: session } = useSession();
-  const [localUsername, setLocalUsername] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [auth, setAuth] = useState(false);
+  const [username, setUsername] = useState('');
 
-  useEffect(() => {
-    setMounted(true);
-    if (!session) {
-      const username = getUsername();
-      setLocalUsername(username);
-      console.log('Navbar mounted, username from localStorage:', username);
+  const checkAuth = () => {
+    if (isAuthenticated()) {
+      setAuth(true);
+      setUsername(getUsername() || 'User');
     } else {
-      console.log('Navbar mounted, session user:', session.user?.name);
+      setAuth(false);
+      setUsername('');
     }
-  }, [session]);
+  };
+  useEffect(() => {
+    checkAuth();
+  }, [pathname]);
+  
+
+  const handleSignOut = () => {
+    removeToken();
+    removeUsername();
+    removeIsAuthenticated();
+    setAuth(false);
+    setUsername('');
+    window.location.href = '/login'; // Redirect after logout
+  };
+
+  const getInitials = (name:string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase();
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
           <Link href="/" className="text-2xl font-bold text-blue-900">
             Bozz Tips
           </Link>
 
-          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-blue-900">
-              Home
-            </Link>
-            <Link href="/predictions" className="text-gray-600 hover:text-blue-900">
-              Predictions
-            </Link>
-            <Link href="/about" className="text-gray-600 hover:text-blue-900">
-              About
-            </Link>
-            
-            {session ? (
+            <Link href="/" className="text-gray-600 hover:text-blue-900">Home</Link>
+            <Link href="/predictions" className="text-gray-600 hover:text-blue-900">Predictions</Link>
+            <Link href="/about" className="text-gray-600 hover:text-blue-900">About</Link>
+
+            {auth ? (
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
                   className="flex items-center space-x-2 text-gray-600 hover:text-blue-900 focus:outline-none"
                 >
-                  {session.user?.image ? (
-                    <img
-                      src={session.user.image}
-                      alt="Profile"
-                      className="w-8 h-8 rounded-full"
-                    />
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center text-white">
-                      {session.user?.name?.[0] || 'U'}
-                    </div>
-                  )}
-                  <span>{mounted ? (session.user?.name || localUsername || 'User') : ''}</span>
+                  <div className="w-8 h-8 rounded-full bg-blue-900 flex items-center justify-center text-white font-semibold">
+                    {getInitials(username)}
+                  </div>
+                  <span>{username}</span>
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                   </svg>
@@ -68,20 +80,10 @@ export default function Navbar() {
 
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1">
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Settings
-                    </Link>
+                    <Link href="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</Link>
+                    <Link href="/settings" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Settings</Link>
                     <button
-                      onClick={() => signOut()}
+                      onClick={handleSignOut}
                       className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Sign out
@@ -99,20 +101,8 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
+          <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               {isMenuOpen ? (
                 <path d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -122,44 +112,18 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                href="/"
-                className="block px-3 py-2 text-gray-600 hover:text-blue-900"
-              >
-                Home
-              </Link>
-              <Link
-                href="/predictions"
-                className="block px-3 py-2 text-gray-600 hover:text-blue-900"
-              >
-                Predictions
-              </Link>
-              <Link
-                href="/about"
-                className="block px-3 py-2 text-gray-600 hover:text-blue-900"
-              >
-                About
-              </Link>
-              {session ? (
+              <Link href="/" className="block px-3 py-2 text-gray-600 hover:text-blue-900">Home</Link>
+              <Link href="/predictions" className="block px-3 py-2 text-gray-600 hover:text-blue-900">Predictions</Link>
+              <Link href="/about" className="block px-3 py-2 text-gray-600 hover:text-blue-900">About</Link>
+              {auth ? (
                 <>
-                  <Link
-                    href="/dashboard"
-                    className="block px-3 py-2 text-gray-600 hover:text-blue-900"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/settings"
-                    className="block px-3 py-2 text-gray-600 hover:text-blue-900"
-                  >
-                    Settings
-                  </Link>
+                  <Link href="/dashboard" className="block px-3 py-2 text-gray-600 hover:text-blue-900">Dashboard</Link>
+                  <Link href="/settings" className="block px-3 py-2 text-gray-600 hover:text-blue-900">Settings</Link>
                   <button
-                    onClick={() => signOut()}
+                    onClick={handleSignOut}
                     className="block w-full text-left px-3 py-2 text-gray-600 hover:text-blue-900"
                   >
                     Sign out
@@ -179,4 +143,4 @@ export default function Navbar() {
       </div>
     </nav>
   );
-} 
+}
