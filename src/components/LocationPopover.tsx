@@ -33,10 +33,10 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
   
   const handlePayWithPaystack = () => {
     const handler = (window as any).PaystackPop.setup({
-      key: 'your-public-key-here', // replace with your Paystack public key
-      email: 'user@example.com',   // ideally from form or user state
+      key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5', // replace with your Paystack public key
+      email: 'Kofiokolobaah@gmail.com',   // ideally from form or user state
       amount: 5000 * 100,          // amount in kobo (₦5,000)
-      currency: 'NGN',
+      currency: 'GHS',
       ref: '' + Math.floor(Math.random() * 1000000000 + 1),
       metadata: {
         custom_fields: [
