@@ -1,15 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import LocationPopover from '../../components/LocationPopover';
 import Link from 'next/link';
 
 export default function VVIPPage() {
-  const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+  const [openPopover, setOpenPopover] = useState<string | null>(null);
+  const dailyBtnRef = useRef<HTMLButtonElement>(null);
+  const weeklyBtnRef = useRef<HTMLButtonElement>(null);
+  const monthlyBtnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Black Header */}
-      <div className="bg-black py-8">
+      <div className="bg-blue-900 py-8">
         <div className="container mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold text-white text-center">VVIP</h1>
         </div>
@@ -51,12 +55,18 @@ export default function VVIPPage() {
                   Access to VVIP Tips (For 1 day)
                 </li>
               </ul>
-              <button 
-                onClick={() => setSelectedPackage('daily')}
-                className="w-full bg-black text-white py-3 font-semibold hover:bg-gray-900 transition-colors"
+              <button
+                ref={dailyBtnRef}
+                onClick={() => setOpenPopover('daily')}
+                className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
               >
                 SELECT PLAN
               </button>
+              <LocationPopover
+                isOpen={openPopover === 'daily'}
+                onClose={() => setOpenPopover(null)}
+                anchorRef={dailyBtnRef as React.RefObject<HTMLButtonElement>}
+              />
             </div>
           </div>
 
@@ -91,12 +101,18 @@ export default function VVIPPage() {
                   Priority Support
                 </li>
               </ul>
-              <button 
-                onClick={() => setSelectedPackage('weekly')}
-                className="w-full bg-black text-white py-3 font-semibold hover:bg-gray-900 transition-colors"
+              <button
+                ref={weeklyBtnRef}
+                onClick={() => setOpenPopover('weekly')}
+                className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
               >
                 SELECT PLAN
               </button>
+              <LocationPopover
+                isOpen={openPopover === 'weekly'}
+                onClose={() => setOpenPopover(null)}
+                anchorRef={weeklyBtnRef as React.RefObject<HTMLButtonElement>}
+              />
             </div>
           </div>
 
@@ -137,12 +153,18 @@ export default function VVIPPage() {
                   Exclusive Analysis
                 </li>
               </ul>
-              <button 
-                onClick={() => setSelectedPackage('monthly')}
-                className="w-full bg-black text-white py-3 font-semibold hover:bg-gray-900 transition-colors"
+              <button
+                ref={monthlyBtnRef}
+                onClick={() => setOpenPopover('monthly')}
+                className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
               >
                 SELECT PLAN
               </button>
+              <LocationPopover
+                isOpen={openPopover === 'monthly'}
+                onClose={() => setOpenPopover(null)}
+                anchorRef={monthlyBtnRef as React.RefObject<HTMLButtonElement>}
+              />
             </div>
           </div>
         </div>

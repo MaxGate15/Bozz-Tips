@@ -3,6 +3,7 @@ import Link from "next/link";
 import React,{ useState,useEffect } from "react";
 import axios from "axios";
 import { getUsername, getToken } from './utils/auth';
+import LocationModal from '../components/LocationModal';
 
 const Home:React.FC =() =>{
   type Game = {
@@ -17,6 +18,7 @@ const Home:React.FC =() =>{
   const [games, setGames] = useState<Game[]>([]);
   const [debugUsername, setDebugUsername] = useState<string | null>(null);
   const [debugToken, setDebugToken] = useState<string | null>(null);
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   useEffect(() => {
     async function fetchGames():Promise<void> {
       try {
@@ -149,12 +151,12 @@ const Home:React.FC =() =>{
             
             {/* Unlock More Button */}
             <div className="text-center mt-12">
-              <Link
-                href="/vvip"
+              <button
                 className="inline-block bg-blue-900 text-white px-12 py-3 uppercase font-semibold hover:bg-blue-800 transition-colors"
+                onClick={() => setIsLocationModalOpen(true)}
               >
                 Unlock More
-              </Link>
+              </button>
             </div>
           </div>
         </div>
@@ -238,6 +240,12 @@ const Home:React.FC =() =>{
         Username in localStorage: {debugUsername || 'null'}<br />
         Token in localStorage: {debugToken || 'null'}
       </div>
+
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelect={() => setIsLocationModalOpen(false)}
+      />
     </div>
   );
 }

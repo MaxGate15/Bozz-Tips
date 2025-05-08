@@ -1,7 +1,9 @@
 'use client';
 import Link from 'next/link';
-import React,{ useState,useEffect } from 'react';
+import React,{ useState,useEffect, useRef } from 'react';
 import axios from 'axios';
+import LocationModal from '../../components/LocationModal';
+import LocationPopover from '../../components/LocationPopover';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -18,6 +20,14 @@ const [selectedDate, setSelectedDate] = useState(new Date());
 const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 const [games, setGames] = useState<Game[]>([])
 const [day, setDay] = useState('today');
+const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
+const buyPlanBtnRef = React.useRef<HTMLButtonElement>(null);
+const [openVvipPopover, setOpenVvipPopover] = useState<number | null>(null);
+const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null)];
+const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
+const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
+
 useEffect(() => {
   async function fetchGames(): Promise<void> {
     try {
@@ -238,7 +248,7 @@ const formatDateForInput = (date: Date) => {
           ))}
           
           <div className="text-center mt-8">
-            <button className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors">
+            <button className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors" onClick={() => setIsLocationModalOpen(true)}>
               GET BOOKING CODE
             </button>
           </div>
@@ -277,12 +287,18 @@ const formatDateForInput = (date: Date) => {
                   Recovery Tips Available
                 </li>
               </ul>
-              <Link
-                href="/vip"
+              <button
+                ref={buyPlanBtnRef}
                 className="block w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center py-3 mt-6 rounded-md font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
+                onClick={() => setIsLocationPopoverOpen(true)}
               >
                 BUY PLAN
-              </Link>
+              </button>
+              <LocationPopover
+                isOpen={isLocationPopoverOpen}
+                onClose={() => setIsLocationPopoverOpen(false)}
+                anchorRef={buyPlanBtnRef as React.RefObject<HTMLButtonElement>}
+              />
             </div>
           </div>
         </div>
@@ -316,9 +332,18 @@ const formatDateForInput = (date: Date) => {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <button className="bg-blue-900 text-white text-sm py-2 px-4 w-full">
+                  <button
+                    ref={vvipBtnRefs[0]}
+                    className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
+                    onClick={() => setOpenVvipPopover(0)}
+                  >
                     10.03 ODDS ($4.00)
                   </button>
+                  <LocationPopover
+                    isOpen={openVvipPopover === 0}
+                    onClose={() => setOpenVvipPopover(null)}
+                    anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
+                  />
                 </div>
               </div>
 
@@ -340,9 +365,18 @@ const formatDateForInput = (date: Date) => {
                   ))}
                 </div>
                 <div className="mt-6">
-                  <button className="bg-blue-900 text-white text-sm py-2 px-4 w-full">
+                  <button
+                    ref={vvipBtnRefs[1]}
+                    className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
+                    onClick={() => setOpenVvipPopover(1)}
+                  >
                     67.86 ODDS ($20.00)
                   </button>
+                  <LocationPopover
+                    isOpen={openVvipPopover === 1}
+                    onClose={() => setOpenVvipPopover(null)}
+                    anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
+                  />
                 </div>
               </div>
 
@@ -405,12 +439,18 @@ const formatDateForInput = (date: Date) => {
                   ))}
                 </div>
                 <div className="mt-6 flex items-center justify-end">
-                  <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-green-500" viewBox="0 0 24 24">
-                      <path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm4.59-12.42L10 14.17l-2.59-2.58L6 13l4 4 8-8z"/>
-                    </svg>
-                    <span className="text-gray-600 text-sm">Won</span>
-                  </div>
+                  <button
+                    ref={vvipBtnRefs[2]}
+                    className="bg-blue-900 text-white text-sm py-2 px-4"
+                    onClick={() => setOpenVvipPopover(2)}
+                  >
+                    1.00 ODDS ($33.33)
+                  </button>
+                  <LocationPopover
+                    isOpen={openVvipPopover === 2}
+                    onClose={() => setOpenVvipPopover(null)}
+                    anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
+                  />
                 </div>
               </div>
             </div>
@@ -422,12 +462,29 @@ const formatDateForInput = (date: Date) => {
           <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">Correct score</h2>
           <div className="max-w-4xl mx-auto">
             <div className="text-blue-600 text-sm mb-4">05/01, 12:00 AM</div>
-            <button className="bg-blue-900 text-white text-lg font-medium py-3 px-12 block mx-auto hover:bg-blue-800 transition-colors">
+            <button
+              ref={correctScoreBtnRef}
+              className="bg-blue-900 text-white text-lg font-medium py-3 px-12 block mx-auto hover:bg-blue-800 transition-colors"
+              onClick={() => setIsCorrectScorePopoverOpen(true)}
+            >
               1.00 ODDS ($33.33)
             </button>
+            <LocationPopover
+              isOpen={isCorrectScorePopoverOpen}
+              onClose={() => setIsCorrectScorePopoverOpen(false)}
+              anchorRef={correctScoreBtnRef as React.RefObject<HTMLButtonElement>}
+            />
           </div>
         </div>
       </div>
+      {isLocationModalOpen && (
+        <div className="fixed top-0 left-0 w-full z-[9999] text-center text-red-600 bg-white">[DEBUG] Location Modal is Open</div>
+      )}
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSelect={() => setIsLocationModalOpen(false)}
+      />
     </div>
   );
 } 
