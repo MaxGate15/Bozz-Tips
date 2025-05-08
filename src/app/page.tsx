@@ -19,19 +19,32 @@ const Home:React.FC =() =>{
   const [debugUsername, setDebugUsername] = useState<string | null>(null);
   const [debugToken, setDebugToken] = useState<string | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+  const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
   useEffect(() => {
     async function fetchGames():Promise<void> {
       try {
-        const response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
-        setGames(response.data);
+        let response;
+        if (selectedDay === 'today') {
+          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
+        } else if (selectedDay === 'yesterday') {
+          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/yesterday-games");
+        } else if (selectedDay === 'tomorrow') {
+          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/tomorrow-games");
+        }
+        if (response) {
+          setGames(response.data);
+        } else {
+          setGames([]);
+        }
       } catch (error) {
         console.error("Error fetching games:", error);
+        setGames([]);
       }
     }
     fetchGames();
     setDebugUsername(getUsername());
     setDebugToken(getToken());
-  },[])
+  },[selectedDay]);
 
   return (
     <div className="min-h-screen">
@@ -66,13 +79,22 @@ const Home:React.FC =() =>{
         <div className="container mx-auto px-4">
           {/* Date Navigation */}
           <div className="flex justify-center space-x-4 mb-8">
-            <button className="px-8 py-2 rounded-full border-2 border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white transition-colors">
+            <button
+              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'yesterday' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+              onClick={() => setSelectedDay('yesterday')}
+            >
               Yesterday
             </button>
-            <button className="px-8 py-2 rounded-full border-2 border-blue-500 bg-blue-500 text-white">
+            <button
+              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'today' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+              onClick={() => setSelectedDay('today')}
+            >
               Today
             </button>
-            <button className="px-8 py-2 rounded-full border-2 border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white transition-colors">
+            <button
+              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'tomorrow' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
+              onClick={() => setSelectedDay('tomorrow')}
+            >
               Tomorrow
             </button>
           </div>
@@ -85,60 +107,18 @@ const Home:React.FC =() =>{
           
           {/* Predictions List */}
           <div className="max-w-4xl mx-auto">
-            {
-            [
-              {
-                date: "01/05",
-                time: "11:30 AM",
-                type: "Over/Under",
-                team1: "Royal Antwerp FC",
-                team2: "RSC Anderlecht",
-                prediction: "Under 4.5"
-              },
-              {
-                date: "01/05",
-                time: "11:00 AM",
-                type: "Double Chance",
-                team1: "Henan",
-                team2: "Wuhan Three Towns FC",
-                prediction: "Home or Draw"
-              },
-              {
-                date: "01/05",
-                time: "11:00 AM",
-                type: "Over/Under",
-                team1: "Zhejiang FC",
-                team2: "Changchun Yatai",
-                prediction: "Over 2.5"
-              },
-              {
-                date: "01/05",
-                time: "11:35 AM",
-                type: "Over/Under",
-                team1: "Shandong Taishan FC",
-                team2: "Qingdao Hainiu FC",
-                prediction: "Over 2.5"
-              },
-              {
-                date: "01/05",
-                time: "11:35 AM",
-                type: "Over/Under",
-                team1: "Shanghai Port FC",
-                team2: "Beijing Guoan",
-                prediction: "Over 2.5"
-              }
-            ].map((match, index) => (
+            {games.map((match, index) => (
               <div 
                 key={index} 
                 className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center space-x-8">
                   <div className="w-24 text-blue-600">
-                    <div className="font-semibold">{match.date}</div>
-                    <div className="text-sm">{match.time}</div>
+                    <div className="font-semibold">{match.date_created}</div>
+                    <div className="text-sm">{match.time_created}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-sm mb-1">{match.type}</div>
+                    <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
                     <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
                   </div>
                 </div>
