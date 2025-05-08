@@ -3,16 +3,19 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import {
   getUsername,
   isAuthenticated,
   removeToken,
   removeUsername,
   removeIsAuthenticated,
+  getToken,
 } from '../app/utils/auth'; // adjust path if necessary
 import { u } from 'framer-motion/client';
 
 export default function Navbar() {
+  const { data: session, status } = useSession();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -20,9 +23,10 @@ export default function Navbar() {
   const [username, setUsername] = useState('');
 
   const checkAuth = () => {
-    if (isAuthenticated()) {
+    // Authenticated if NextAuth session exists or custom token exists
+    if ((status === 'authenticated' && session) || isAuthenticated() || getToken()) {
       setAuth(true);
-      setUsername(getUsername() || 'User');
+      setUsername(getUsername() || session?.user?.name || 'User');
     } else {
       setAuth(false);
       setUsername('');
@@ -30,7 +34,7 @@ export default function Navbar() {
   };
   useEffect(() => {
     checkAuth();
-  }, [pathname]);
+  }, [pathname, status, session]);
   
 
   const handleSignOut = () => {

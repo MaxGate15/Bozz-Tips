@@ -3,6 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { getToken } from '../utils/auth';
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
@@ -10,7 +11,7 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' && !getToken()) {
       router.push('/login');
     }
   }, [status, router]);

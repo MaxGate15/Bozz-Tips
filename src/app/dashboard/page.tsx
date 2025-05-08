@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { getUsername } from '../utils/auth';
+import { getUsername, getToken } from '../utils/auth';
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (status === 'unauthenticated') {
+    if (status === 'unauthenticated' && !getToken()) {
       router.push('/login');
     }
     // Get username from local storage if session is not available
