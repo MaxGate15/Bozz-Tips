@@ -129,7 +129,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold">Card Payment</button>
+              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold" onClick={handlePayWithPaystack}>Card Payment</button>
               <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold">Crypto</button>
             </div>
           )}
