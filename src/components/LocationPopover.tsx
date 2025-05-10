@@ -13,7 +13,7 @@ interface LocationPopoverProps {
   anchorRef: React.RefObject<HTMLButtonElement>;
 }
 async function getRate(currencyCode: string): Promise<number> {
-  const res = await fetch(`https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/USD`);
+  const res = await fetch(`https://v6.exchangerate-api.com/v6/37df04ffeafcf2a0e93ef8a3/latest/USD`);
   const data = await res.json();
   const rate = data.conversion_rates[currencyCode];
   const amountInLocal = rate * 5; // e.g., 5 USD worth
