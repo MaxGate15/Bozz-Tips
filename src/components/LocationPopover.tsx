@@ -111,7 +111,8 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
             <button
               onClick={() => {
                 setSelectedLocation('ghana');
-                setStep('payment');
+                handlePayWithPaystack();
+                onClose();
               }}
               className="bg-gradient-to-r from-blue-700 to-blue-900 text-white font-bold py-2 px-6 rounded-lg shadow hover:from-blue-800 hover:to-blue-950 border border-blue-900 text-base transition-all"
             >
