@@ -48,6 +48,43 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
     };
   }, [isOpen, onClose, anchorRef]);
 
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://js.paystack.co/v1/inline.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
+  const handlePayWithPaystack = () => {
+    const handler = (window as any).PaystackPop.setup({
+      key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5', // replace with your Paystack public key
+      email: 'Kofiokolobaah@gmail.com',   // ideally from form or user state
+      amount: 5000 * 100,          // amount in kobo (₦5,000)
+      currency: 'GHS',
+      ref: '' + Math.floor(Math.random() * 1000000000 + 1),
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Location",
+            variable_name: "location",
+            value: selectedCountry,
+          },
+        ],
+      },
+      callback: function (response: any) {
+        alert('Payment successful! Reference: ' + response.reference);
+        onClose();
+      },
+      onClose: function () {
+        alert('Payment cancelled');
+      },
+    });
+    handler.openIframe();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -114,11 +151,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           <button
             className="w-full bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-900 disabled:opacity-50"
             disabled={!selectedCountry}
-            onClick={() => {
-              // Placeholder for Paystack redirect
-              alert(`Selected country: ${selectedCountry}. Implement Paystack payment here.`);
-              onClose();
-            }}
+            onClick={handlePayWithPaystack}
           >
             Continue to Payment
           </button>
