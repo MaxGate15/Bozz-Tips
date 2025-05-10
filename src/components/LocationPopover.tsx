@@ -1,16 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 const countries = [
-  'Nigeria',
-  'South Africa',
-  'Kenya'
+  { country: 'Nigeria', code: 'NGN' },      // ✅ Valid
+  { country: 'South Africa', code: 'ZAR' }, // ✅ Valid
+  { country: 'Kenya', code: 'KES' }         // ✅ Valid
 ];
+
 
 interface LocationPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   anchorRef: React.RefObject<HTMLButtonElement>;
 }
+async function getRate(currencyCode: string): Promise<number> {
+  const res = await fetch(`https://v6.exchangerate-api.com/v6/YOUR_API_KEY/latest/USD`);
+  const data = await res.json();
+  const rate = data.conversion_rates[currencyCode];
+  const amountInLocal = rate * 5; // e.g., 5 USD worth
+  return Math.floor(amountInLocal * 100); // Convert to kobo, cents, etc.
+}
+
+
+
 
 const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anchorRef }) => {
   const [step, setStep] = useState<'location' | 'payment' | 'country'>('location');
@@ -58,12 +69,14 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
     };
   }, []);
 
-  const handlePayWithPaystack = (paymentType?: string) => {
+  const handlePayWithPaystack = async (paymentType?: string, country?: string ) => {
+    const rate = await getRate(country|| 'GHS'); // Must return amount in kobo (or equivalent in smallest unit)
+    
     const handler = (window as any).PaystackPop.setup({
-      key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5', // replace with your Paystack public key
-      email: 'Kofiokolobaah@gmail.com',   // ideally from form or user state
-      amount: 5000 * 100,          // amount in kobo (₦5,000)
-      currency: 'GHS',
+      key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
+      email: 'Kofiokolobaah@gmail.com',
+      amount: rate, // Already converted in smallest unit
+      currency: country,
       ref: '' + Math.floor(Math.random() * 1000000000 + 1),
       metadata: {
         custom_fields: [
@@ -87,8 +100,10 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         alert('Payment cancelled');
       },
     });
+  
     handler.openIframe();
   };
+  
 
   if (!isOpen) return null;
 
@@ -151,13 +166,13 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           >
             <option value="">-- Select Country --</option>
             {countries.map(country => (
-              <option key={country} value={country}>{country}</option>
+              <option key={country.country} value={country.code}>{country.country}</option>
             ))}
           </select>
           <button
             className="w-full bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-900 disabled:opacity-50"
             disabled={!selectedCountry}
-            onClick={() => handlePayWithPaystack()}
+            onClick={() => handlePayWithPaystack(selectedCountry)}
           >
             Continue to Payment
           </button>
