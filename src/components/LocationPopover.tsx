@@ -58,7 +58,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
     };
   }, []);
 
-  const handlePayWithPaystack = () => {
+  const handlePayWithPaystack = (paymentType?: string) => {
     const handler = (window as any).PaystackPop.setup({
       key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5', // replace with your Paystack public key
       email: 'Kofiokolobaah@gmail.com',   // ideally from form or user state
@@ -70,9 +70,14 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           {
             display_name: "Location",
             variable_name: "location",
-            value: selectedCountry,
+            value: selectedCountry || (selectedLocation === 'ghana' ? 'Ghana' : ''),
           },
-        ],
+          paymentType ? {
+            display_name: "Payment Type",
+            variable_name: "payment_type",
+            value: paymentType,
+          } : null,
+        ].filter(Boolean),
       },
       callback: function (response: any) {
         alert('Payment successful! Reference: ' + response.reference);
@@ -129,8 +134,8 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           <h2 className="text-xl font-bold text-center mb-6 text-blue-700">PAYMENT METHOD</h2>
           {selectedLocation === 'ghana' ? (
             <div className="flex flex-col gap-3">
-              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold">Mobile Money</button>
-              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold">Card Payment</button>
+              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold" onClick={() => handlePayWithPaystack('Mobile Money')}>Mobile Money</button>
+              <button className="bg-blue-700 text-white py-2 rounded hover:bg-blue-900 font-semibold" onClick={() => handlePayWithPaystack('Card Payment')}>Card Payment</button>
             </div>
           ) : null}
         </>
@@ -151,7 +156,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           <button
             className="w-full bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-900 disabled:opacity-50"
             disabled={!selectedCountry}
-            onClick={handlePayWithPaystack}
+            onClick={() => handlePayWithPaystack()}
           >
             Continue to Payment
           </button>
