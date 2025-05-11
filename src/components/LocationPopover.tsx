@@ -70,16 +70,15 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
     };
   }, []);
 
-  const handlePayWithPaystack = async (paymentType?: string, country?: string ) => {
+  const handlePayWithPaystack = async ( country?: string ) => {
     const rate = await getRate(country|| 'GHS'); // Must return amount in kobo (or equivalent in smallest unit)
     console.log(country);
     const handler = (window as any).PaystackPop.setup({
       key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
       email: 'Kofiokolobaah@gmail.com',
       amount: rate, // Already converted in smallest unit
-      
-      
-      currency: country,
+
+      currency: country|| 'GHS', // Use the currency code for Ghana (GHS) or the selected country code
 
       ref: '' + Math.floor(Math.random() * 1000000000 + 1),
       metadata: {
@@ -89,11 +88,6 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
             variable_name: "location",
             value: selectedCountry || (selectedLocation === 'ghana' ? 'Ghana' : ''),
           },
-          paymentType ? {
-            display_name: "Payment Type",
-            variable_name: "payment_type",
-            value: paymentType,
-          } : null,
         ].filter(Boolean),
       },
       callback: function (response: any) {
@@ -176,7 +170,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
           <button
             className="w-full bg-blue-700 text-white py-2 rounded font-semibold hover:bg-blue-900 disabled:opacity-50"
             disabled={!selectedCountry}
-            onClick={() =>handlePayWithPaystack('Card Payment', selectedCountry)}
+            onClick={() =>handlePayWithPaystack(selectedCountry)}
           >
             Continue to Payment
           </button>
