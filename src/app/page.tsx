@@ -1,50 +1,44 @@
-'use client'
+'use client';
 import Link from "next/link";
-import React,{ useState,useEffect } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { getUsername, getToken } from './utils/auth';
 import LocationModal from '../components/LocationModal';
+import useGames from "./freegames/FreeGames";
 
-const Home:React.FC =() =>{
-  type Game = {
-    game_id: number;
-    date_created: string;
-    time_created: string;
-    game_type: string;
-    team1: string;
-    team2: string;
-    prediction: string;
-  }
+type Game = {
+  game_id: number;
+  date_created: string;
+  time_created: string;
+  game_type: string;
+  team1: string;
+  team2: string;
+  prediction: string;
+};
+
+const Home: React.FC = () => {
   const [games, setGames] = useState<Game[]>([]);
   const [debugUsername, setDebugUsername] = useState<string | null>(null);
   const [debugToken, setDebugToken] = useState<string | null>(null);
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
   const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
+
+  const { today, tomorrow, yesterday, loading, error } = useGames();
+
   useEffect(() => {
-    async function fetchGames():Promise<void> {
-      try {
-        let response;
-        if (selectedDay === 'today') {
-          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games");
-        } else if (selectedDay === 'yesterday') {
-          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/yesterday-games");
-        } else if (selectedDay === 'tomorrow') {
-          response = await axios.get<Game[]>("https://wonit-backend.onrender.com/tomorrow-games");
-        }
-        if (response) {
-          setGames(response.data);
-        } else {
-          setGames([]);
-        }
-      } catch (error) {
-        console.error("Error fetching games:", error);
-        setGames([]);
-      }
+    // Update the game list based on selected day
+    if (selectedDay === 'today') {
+      setGames(today);
+    } else if (selectedDay === 'tomorrow') {
+      setGames(tomorrow);
+    } else if (selectedDay === 'yesterday') {
+      setGames(yesterday);
     }
-    fetchGames();
+  }, [selectedDay, today, tomorrow, yesterday]);
+
+  useEffect(() => {
     setDebugUsername(getUsername());
     setDebugToken(getToken());
-  },[selectedDay]);
+  }, []);
 
   return (
     <div className="min-h-screen">
@@ -73,62 +67,65 @@ const Home:React.FC =() =>{
           </div>
         </div>
       </section>
+      {/* ... (unchanged) ... */}
 
       {/* Predictions Timeline */}
       <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           {/* Date Navigation */}
           <div className="flex justify-center space-x-4 mb-8">
-            <button
-              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'yesterday' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
-              onClick={() => setSelectedDay('yesterday')}
-            >
-              Yesterday
-            </button>
-            <button
-              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'today' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
-              onClick={() => setSelectedDay('today')}
-            >
-              Today
-            </button>
-            <button
-              className={`px-8 py-2 rounded-full border-2 ${selectedDay === 'tomorrow' ? 'bg-blue-500 text-white border-blue-500' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
-              onClick={() => setSelectedDay('tomorrow')}
-            >
-              Tomorrow
-            </button>
+            {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
+              <button
+                key={day}
+                className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
+                  } transition-colors`}
+                onClick={() => setSelectedDay(day)}
+              >
+                {day.charAt(0).toUpperCase() + day.slice(1)}
+              </button>
+            ))}
           </div>
 
           {/* Title */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">Today's Football Matches Predictions For Thursday, May 1, 2025</h2>
-            <p className="text-gray-600">Here are all of our football betting predictions for Thursday, May 1, 2025.</p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
+              Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+            </h2>
+            <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
           </div>
-          
+
           {/* Predictions List */}
           <div className="max-w-4xl mx-auto">
-            {games.map((match, index) => (
-              <div 
-                key={index} 
-                className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center space-x-8">
-                  <div className="w-24 text-blue-600">
-                    <div className="font-semibold">{match.date_created}</div>
-                    <div className="text-sm">{match.time_created}</div>
+          {loading ? (
+              <p className="text-center text-gray-500">Loading games...</p>
+            ) : games.length === 0 ? (
+              <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
+            ) : (
+              games.map((match, index) => (
+                <div
+                  key={index}
+                  className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                >
+                  <div className="flex items-center space-x-8">
+                    <div className="w-24 text-blue-600">
+                      <div className="font-semibold">{match.date_created}</div>
+                      <div className="text-sm">{match.time_created}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
+                      <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
-                    <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">{match.prediction}</span>
+                    <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-600">{match.prediction}</span>
-                  <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
-                </div>
-              </div>
-            ))}
-            
+              ))
+            )}
+
             {/* Unlock More Button */}
             <div className="text-center mt-12">
               <button
@@ -141,8 +138,6 @@ const Home:React.FC =() =>{
           </div>
         </div>
       </section>
-
-      {/* Stats Section */}
       <section className="py-20 bg-blue-900">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-white">Why Us?</h2>
@@ -183,8 +178,6 @@ const Home:React.FC =() =>{
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
       <section className="py-20 bg-blue-900 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-8">Join Us Now</h2>
@@ -214,12 +207,14 @@ const Home:React.FC =() =>{
         </div>
       </section>
 
+      {/* ... Other sections unchanged ... */}
+
       {/* Debug Info */}
-      <div style={{ background: '#fee', color: '#900', padding: '1rem', margin: '1rem 0', borderRadius: '8px' }}>
+      {/* <div style={{ background: '#fee', color: '#900', padding: '1rem', margin: '1rem 0', borderRadius: '8px' }}>
         <strong>Debug Info:</strong><br />
         Username in localStorage: {debugUsername || 'null'}<br />
         Token in localStorage: {debugToken || 'null'}
-      </div>
+      </div> */}
 
       <LocationModal
         isOpen={isLocationModalOpen}
@@ -228,6 +223,6 @@ const Home:React.FC =() =>{
       />
     </div>
   );
-}
+};
 
 export default Home;
