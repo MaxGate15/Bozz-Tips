@@ -4,6 +4,7 @@ import React,{ useState,useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
+import useGames from '../freegames/FreeGames';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -27,33 +28,23 @@ const [openVvipPopover, setOpenVvipPopover] = useState<number | null>(null);
 const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null)];
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
+const { today, tomorrow, yesterday, loading, error } = useGames();
+const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
+
+
 
 useEffect(() => {
-  async function fetchGames(): Promise<void> {
-    try {
-      let response;
-
-      if (day === 'today') {
-        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/today-games/");
-      } else if (day === 'yesterday') {
-        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/yesterday-games");
-      } else if (day === 'tomorrow') {
-        response = await axios.get<Game[]>("https://wonit-backend.onrender.com/tomorrow-games");
-      } else {
-        const formattedDate = formatDateForInput(selectedDate);
-        response = await axios.get<Game[]>(`https://wonit-backend.onrender.com/other-games?formattedDate=${formattedDate}`);
-      }
-
-      const gamesData = response.data 
-      setGames(gamesData);
-      console.log(gamesData);
-    } catch (error) {
-      console.error("Error fetching games:", error);
-    }
+  // Update the game list based on selected day
+  if (selectedDay === 'today') {
+    setGames(today);
+  } else if (selectedDay === 'tomorrow') {
+    setGames(tomorrow);
+  } else if (selectedDay === 'yesterday') {
+    setGames(yesterday);
   }
+}, [selectedDay, today, tomorrow, yesterday]);
 
-  fetchGames();
-}, [day, selectedDate]);
+
 
 const formatDate = (date: Date) => {
   return date.toLocaleDateString('en-US', {
@@ -113,140 +104,60 @@ const formatDateForInput = (date: Date) => {
       <div className="container mx-auto px-4 py-8">
         {/* Date Navigation */}
         <div className="flex justify-center space-x-4 mb-8">
-        <button 
-  onClick={goToYesterday}
-  className={`px-8 py-2 rounded-full border ${day === 'yesterday' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
->
-  Yesterday
-</button>
-
-          <button 
-  onClick={goToToday}
-  className={`px-8 py-2 rounded-full border ${day === 'today' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
->
-  Today
-</button>
-
-<button 
-  onClick={goToTomorrow}
-  className={`px-8 py-2 rounded-full border ${day === 'tomorrow' ? 'bg-blue-500 text-white' : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'} transition-colors`}
->
-  Tomorrow
-</button>
-
-          
-          <button
-            onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-            className="px-4 py-2 rounded-full border border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-          </button>
-          {isDatePickerOpen && (
-            <div className="absolute right-0 mt-2 bg-white rounded-lg shadow-lg p-2 z-50">
-              <input
-                type="date"
-                value={formatDateForInput(selectedDate)}
-                onChange={handleDateChange}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-center cursor-pointer hover:border-blue-500 transition-colors appearance-none"
-              />
-            </div>
-          )}
-        </div>
+            {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
+              <button
+                key={day}
+                className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
+                  ? 'bg-blue-500 text-white border-blue-500'
+                  : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
+                  } transition-colors`}
+                onClick={() => setSelectedDay(day)}
+              >
+                {day.charAt(0).toUpperCase() + day.slice(1)}
+              </button>
+            ))}
+          </div>
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2 text-blue-900">
-            Football Matches Predictions For {formatDate(selectedDate)}
-          </h2>
-          <p className="text-gray-600">
-            Here are all of our football betting predictions for {formatDate(selectedDate)}.
-          </p>
-        </div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
+              Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+            </h2>
+            <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
+          </div>
 
         {/* Free Predictions List */}
         <div className="max-w-4xl mx-auto space-y-4 mb-12">
-          {games.map((match, index) => (
-            <div 
-              key={index}
-              className="bg-white p-6 flex items-center justify-between hover:shadow-md transition-shadow rounded-lg border border-gray-100"
-            >
-              <div className="flex items-center space-x-8">
-                <div className="w-24 text-blue-600">
-                  <div className="font-semibold">{match.date_created}</div>
-                  <div className="text-sm">{match.time_created}</div>
-                </div>
-                <div>
-                  <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
-                  <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-gray-600">{match.prediction}</span>
-                <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
-              </div>
-            </div>
-          ))}
-        </div>
+          {loading ? (
+                        <p className="text-center text-gray-500">Loading games...</p>
+                      ) : games.length === 0 ? (
+                        <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
+                      ) : (
+                        games.map((match, index) => (
+                          <div
+                            key={index}
+                            className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center space-x-8">
+                              <div className="w-24 text-blue-600">
+                                <div className="font-semibold">{match.date_created}</div>
+                                <div className="text-sm">{match.time_created}</div>
+                              </div>
+                              <div>
+                                <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
+                                <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <span className="text-gray-600">{match.prediction}</span>
+                              <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
+                            </div>
+                          </div>
+                        ))
+                      )}
+        
 
         {/* Booking Code Section */}
-        <div className="max-w-4xl mx-auto mb-12">
-          {[
-            {
-              date: "01/05",
-              time: "07:00 PM",
-              type: "Handicap 0:2",
-              team1: "Athletic Bilbao",
-              team2: "Man Utd",
-              prediction: "Away (0:2)"
-            },
-            {
-              date: "01/05",
-              time: "05:30 PM",
-              type: "Double Chance",
-              team1: "Nottingham Forest",
-              team2: "Brentford FC",
-              prediction: "Home or Away"
-            },
-            {
-              date: "01/05",
-              time: "05:30 PM",
-              type: "Over/Under",
-              team1: "Viborg FF",
-              team2: "Copenhagen",
-              prediction: "Over 1.5"
-            },
-            {
-              date: "01/05",
-              time: "04:00 PM",
-              type: "Over/Under",
-              team1: "Rosenborg BK",
-              team2: "Kristiansund BK",
-              prediction: "Over 2.5"
-            }
-          ].map((match, index) => (
-            <div 
-              key={index}
-              className="bg-white p-6 mb-4 flex items-center justify-between hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center space-x-8">
-                <div className="w-32">
-                  <div className="text-blue-600 font-medium">{match.date}</div>
-                  <div className="text-blue-600 text-sm">{match.time}</div>
-                </div>
-                <div>
-                  <div className="text-gray-500 text-sm mb-1">{match.type}</div>
-                  <div className="font-medium">{match.team1} vs {match.team2}</div>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2">
-                <span className="text-gray-600">{match.prediction}</span>
-                <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
-              </div>
-            </div>
-          ))}
-          
           <div className="text-center mt-8">
             <button className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors" onClick={() => setIsLocationModalOpen(true)}>
               GET BOOKING CODE
