@@ -30,8 +30,13 @@ const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
 const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
-
-
+const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
+const bookingBtnRef = useRef<HTMLButtonElement>(null);
+const bookingCodes = [
+  { site: 'SportyBet', code: 'AD3S4S' },
+  { site: 'Betway', code: '123647' },
+];
+const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
 useEffect(() => {
   // Update the game list based on selected day
@@ -43,8 +48,6 @@ useEffect(() => {
     setGames(yesterday);
   }
 }, [selectedDay, today, tomorrow, yesterday]);
-
-
 
 const formatDate = (date: Date) => {
   return date.toLocaleDateString('en-US', {
@@ -61,7 +64,6 @@ const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   setDay('other'); // ✅ Move this here
   setIsDatePickerOpen(false);
 };
-
 
 const goToYesterday = () => {
   const yesterday = new Date(selectedDate);
@@ -91,7 +93,6 @@ const formatDateForInput = (date: Date) => {
   return `${year}-${month}-${day}`;
 };
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -104,65 +105,100 @@ const formatDateForInput = (date: Date) => {
       <div className="container mx-auto px-4 py-8">
         {/* Date Navigation */}
         <div className="flex justify-center space-x-4 mb-8">
-            {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
-              <button
-                key={day}
-                className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
-                  ? 'bg-blue-500 text-white border-blue-500'
-                  : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
-                  } transition-colors`}
-                onClick={() => setSelectedDay(day)}
-              >
-                {day.charAt(0).toUpperCase() + day.slice(1)}
-              </button>
-            ))}
-          </div>
+          {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
+            <button
+              key={day}
+              className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
+                ? 'bg-blue-500 text-white border-blue-500'
+                : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
+                } transition-colors`}
+              onClick={() => setSelectedDay(day)}
+            >
+              {day.charAt(0).toUpperCase() + day.slice(1)}
+            </button>
+          ))}
+        </div>
 
         {/* Title */}
         <div className="text-center mb-8">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
-              Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
-            </h2>
-            <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
-          </div>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
+            Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
+          </h2>
+          <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
+        </div>
 
         {/* Free Predictions List */}
         <div className="max-w-4xl mx-auto space-y-4 mb-12">
           {loading ? (
-                        <p className="text-center text-gray-500">Loading games...</p>
-                      ) : games.length === 0 ? (
-                        <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
-                      ) : (
-                        games.map((match, index) => (
-                          <div
-                            key={index}
-                            className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                          >
-                            <div className="flex items-center space-x-8">
-                              <div className="w-24 text-blue-600">
-                                <div className="font-semibold">{match.date_created}</div>
-                                <div className="text-sm">{match.time_created}</div>
-                              </div>
-                              <div>
-                                <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
-                                <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
-                              </div>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              <span className="text-gray-600">{match.prediction}</span>
-                              <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
-                            </div>
-                          </div>
-                        ))
-                      )}
-        
+            <p className="text-center text-gray-500">Loading games...</p>
+          ) : games.length === 0 ? (
+            <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
+          ) : (
+            games.map((match, index) => (
+              <div
+                key={index}
+                className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 text-blue-600">
+                    <div className="font-semibold">{match.date_created}</div>
+                    <div className="text-sm">{match.time_created}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
+                    <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-600">{match.prediction}</span>
+                  <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
 
         {/* Booking Code Section */}
-          <div className="text-center mt-8">
-            <button className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors" onClick={() => setIsLocationModalOpen(true)}>
-              GET BOOKING CODE
-            </button>
-          </div>
+        <div className="text-center mt-8 relative">
+          <button
+            ref={bookingBtnRef}
+            className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors"
+            onClick={() => setIsBookingPopoverOpen((open) => !open)}
+          >
+            GET BOOKING CODE
+          </button>
+          {isBookingPopoverOpen && (
+            <div
+              className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-blue-200 rounded-lg shadow-lg z-50 p-4"
+              style={{ top: '100%' }}
+            >
+              <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
+              {bookingCodes.map((item) => (
+                <div key={item.site} className="flex justify-between items-center py-1 gap-2">
+                  <span className="text-gray-700">{item.site}:</span>
+                  <span className="font-mono text-blue-700 text-lg">{item.code}</span>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(item.code);
+                      setCopiedCode(item.code);
+                      setTimeout(() => setCopiedCode(null), 1200);
+                    }}
+                    className="ml-2 p-1 rounded hover:bg-blue-100"
+                    title="Copy code"
+                  >
+                    {copiedCode === item.code ? (
+                      <span className="text-green-600 text-xs font-semibold">Copied!</span>
+                    ) : (
+                      <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                        <rect x="3" y="3" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* VIP Section */}
@@ -388,16 +424,8 @@ const formatDateForInput = (date: Date) => {
           </div>
         </div>
       </div>
-      {isLocationModalOpen && (
-        <div className="fixed top-0 left-0 w-full z-[9999] text-center text-red-600 bg-white">[DEBUG] Location Modal is Open</div>
-      )}
-      <LocationModal
-        isOpen={isLocationModalOpen}
-        onClose={() => setIsLocationModalOpen(false)}
-        onSelect={() => setIsLocationModalOpen(false)}
-      />
     </div>
   );
-} 
+}
 
 export default PredictionsPage;

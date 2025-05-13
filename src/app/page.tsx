@@ -1,9 +1,10 @@
 'use client';
 import Link from "next/link";
 import React, { useState, useEffect } from "react";
-import { getUsername, getToken } from './utils/auth';
+import { getUsername, getToken, isAuthenticated } from './utils/auth';
 import LocationModal from '../components/LocationModal';
 import useGames from "./freegames/FreeGames";
+import { useSession } from 'next-auth/react';
 
 type Game = {
   game_id: number;
@@ -23,6 +24,7 @@ const Home: React.FC = () => {
   const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
 
   const { today, tomorrow, yesterday, loading, error } = useGames();
+  const { data: session } = useSession();
 
   useEffect(() => {
     // Update the game list based on selected day
@@ -130,7 +132,13 @@ const Home: React.FC = () => {
             <div className="text-center mt-12">
               <button
                 className="inline-block bg-blue-900 text-white px-12 py-3 uppercase font-semibold hover:bg-blue-800 transition-colors"
-                onClick={() => setIsLocationModalOpen(true)}
+                onClick={() => {
+                  if (!(session || isAuthenticated() || getToken())) {
+                    window.location.href = '/login';
+                  } else {
+                    window.location.href = '/vvip';
+                  }
+                }}
               >
                 Unlock More
               </button>
