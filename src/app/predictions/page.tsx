@@ -4,7 +4,7 @@ import React,{ useState,useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
-import useGames from '../Games/FreeGames';
+import useGames from '../freegames/FreeGames';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -18,9 +18,9 @@ const PredictionsPage:React.FC = () => {
     odd: string;
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
-type VVIPGame = {
+// type VVIPGame = {
 
-}
+// }
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
