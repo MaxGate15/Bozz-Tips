@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { u } from "framer-motion/client";
 
 const useGames = () => {
     const [today, setToday] = useState([]);
@@ -17,9 +18,21 @@ const useGames = () => {
                     axios.get("https://wonit-backend.onrender.com/yesterday-games"),
                 ]);
 
-                setToday(todayRes.data);
-                setTomorrow(tomorrowRes.data);
-                setYesterday(yesterdayRes.data);
+                // Flatten games from slips
+                const extractGames = (slips) => {
+                    return slips.flatMap((slip) =>
+                        slip.games.map((game) => ({
+                            ...game,
+                            slip_id: slip.slip_id, // optional, if needed for context
+                            date_created: slip.date_created, // reuse slip info if needed
+                            booking_code: slip.booking_code, // optional
+                        }))
+                    );
+                };
+
+                setToday(extractGames(todayRes.data));
+                setTomorrow(extractGames(tomorrowRes.data));
+                setYesterday(extractGames(yesterdayRes.data));
             } catch (err) {
                 console.error("Error fetching data:", err);
                 setError(err);
@@ -30,6 +43,9 @@ const useGames = () => {
 
         fetchData();
     }, []);
+    console.log("today", today);
+    console.log("tomorrow", tomorrow);
+    console.log("yesterday", yesterday);
 
     return { today, tomorrow, yesterday, loading, error };
 };
