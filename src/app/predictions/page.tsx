@@ -4,7 +4,7 @@ import React,{ useState,useEffect, useRef } from 'react';
 import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
-import useGames from '../freegames/FreeGames';
+import useGames from '../Games/FreeGames';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -19,7 +19,7 @@ const PredictionsPage:React.FC = () => {
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
 type VVIPGame = {
-  
+
 }
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
@@ -34,9 +34,7 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
-console.log('Today:', today);
-console.log('Tomorrow:', tomorrow);
-console.log('Yesterday:', yesterday);
+
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
 const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
