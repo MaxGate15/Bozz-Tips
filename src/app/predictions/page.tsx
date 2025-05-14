@@ -15,10 +15,12 @@ const PredictionsPage:React.FC = () => {
     team1: string;
     team2: string;
     prediction: string;
+    code: string;
+    booking_code: string;
 }
 
-const [selectedDate, setSelectedDate] = useState(new Date());
-const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+// const [selectedDate, setSelectedDate] = useState(new Date());
+// const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 const [games, setGames] = useState<Game[]>([])
 const [day, setDay] = useState('today');
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -29,13 +31,14 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
+
 const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
 const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
 const bookingBtnRef = useRef<HTMLButtonElement>(null);
-const bookingCodes = [
-  { site: 'SportyBet', code: 'AD3S4S' },
-  { site: 'Betway', code: '123647' },
-];
+// const bookingCodes = [
+//   { site: 'SportyBet', code: 'AD3S4S' },
+//   { site: 'Betway', code: '123647' },
+// ];
 const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
 useEffect(() => {
@@ -49,49 +52,49 @@ useEffect(() => {
   }
 }, [selectedDay, today, tomorrow, yesterday]);
 
-const formatDate = (date: Date) => {
-  return date.toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
+// const formatDate = (date: Date) => {
+//   return date.toLocaleDateString('en-US', {
+//     weekday: 'long',
+//     year: 'numeric',
+//     month: 'long',
+//     day: 'numeric'
+//   });
+// };
 
-const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const newDate = new Date(e.target.value);
-  setSelectedDate(newDate);
-  setDay('other'); // ✅ Move this here
-  setIsDatePickerOpen(false);
-};
+// const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+//   const newDate = new Date(e.target.value);
+//   setSelectedDate(newDate);
+//   setDay('other'); // ✅ Move this here
+//   setIsDatePickerOpen(false);
+// };
 
-const goToYesterday = () => {
-  const yesterday = new Date(selectedDate);
-  yesterday.setDate(selectedDate.getDate() - 1);
-  setSelectedDate(yesterday);
-  setDay('yesterday');
+// const goToYesterday = () => {
+//   const yesterday = new Date(selectedDate);
+//   yesterday.setDate(selectedDate.getDate() - 1);
+//   setSelectedDate(yesterday);
+//   setDay('yesterday');
   
-};
+// };
 
-const goToTomorrow = () => {
-  const tomorrow = new Date(selectedDate);
-  tomorrow.setDate(selectedDate.getDate() + 1);
-  setDay('tomorrow');
-  setSelectedDate(tomorrow);
+// const goToTomorrow = () => {
+//   const tomorrow = new Date(selectedDate);
+//   tomorrow.setDate(selectedDate.getDate() + 1);
+//   setDay('tomorrow');
+//   setSelectedDate(tomorrow);
   
-};
-const goToToday = () => {
-  const today = new Date();
-  setSelectedDate(today);
-  setDay('today');
-};
+// };
+// const goToToday = () => {
+//   const today = new Date();
+//   setSelectedDate(today);
+//   setDay('today');
+// };
 
-const formatDateForInput = (date: Date) => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+// const formatDateForInput = (date: Date) => {
+//   const year = date.getFullYear();
+//   const month = String(date.getMonth() + 1).padStart(2, '0');
+//   const day = String(date.getDate()).padStart(2, '0');
+//   return `${year}-${month}-${day}`;
+// };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -173,20 +176,20 @@ const formatDateForInput = (date: Date) => {
               style={{ top: '100%' }}
             >
               <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
-              {bookingCodes.map((item) => (
-                <div key={item.site} className="flex justify-between items-center py-1 gap-2">
-                  <span className="text-gray-700">{item.site}:</span>
-                  <span className="font-mono text-blue-700 text-lg">{item.code}</span>
+              {games.map((item) => (
+                <div key={item.booking_code} className="flex justify-between items-center py-1 gap-2">
+                  <span className="text-gray-700">{item.booking_code}:</span>
+                  <span className="font-mono text-blue-700 text-lg">{item.booking_code}</span>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(item.code);
-                      setCopiedCode(item.code);
+                      navigator.clipboard.writeText(item.booking_code);
+                      setCopiedCode(item.booking_code);
                       setTimeout(() => setCopiedCode(null), 1200);
                     }}
                     className="ml-2 p-1 rounded hover:bg-blue-100"
                     title="Copy code"
                   >
-                    {copiedCode === item.code ? (
+                    {copiedCode === item.booking_code ? (
                       <span className="text-green-600 text-xs font-semibold">Copied!</span>
                     ) : (
                       <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
