@@ -6,6 +6,7 @@ import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
 
+
 const PredictionsPage:React.FC = () => {
   type Game = {
     game_id: number;
