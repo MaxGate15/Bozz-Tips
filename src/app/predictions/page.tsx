@@ -6,6 +6,7 @@ import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
 
+
 const PredictionsPage:React.FC = () => {
   type Game = {
     game_id: number;
@@ -15,9 +16,12 @@ const PredictionsPage:React.FC = () => {
     team1: string;
     team2: string;
     prediction: string;
-    code: string;
-    booking_code: string;
+    odd: string;
+    booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
+// type VVIPGame = {
+
+// }
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -31,6 +35,8 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
+
+// const [selectedDate, setSelectedDate] = useState(new Date());
 
 const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
 const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
@@ -96,6 +102,7 @@ useEffect(() => {
 //   return `${year}-${month}-${day}`;
 // };
 
+console.log('Games:', games);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -176,30 +183,57 @@ useEffect(() => {
               style={{ top: '100%' }}
             >
               <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
-              {games.map((item) => (
-                <div key={item.booking_code} className="flex justify-between items-center py-1 gap-2">
-                  <span className="text-gray-700">{item.booking_code}:</span>
-                  <span className="font-mono text-blue-700 text-lg">{item.booking_code}</span>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(item.booking_code);
-                      setCopiedCode(item.booking_code);
-                      setTimeout(() => setCopiedCode(null), 1200);
-                    }}
-                    className="ml-2 p-1 rounded hover:bg-blue-100"
-                    title="Copy code"
-                  >
-                    {copiedCode === item.booking_code ? (
-                      <span className="text-green-600 text-xs font-semibold">Copied!</span>
-                    ) : (
-                      <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none" />
-                        <rect x="3" y="3" width="13" height="13" rx="2" ry="2" stroke="currentColor" strokeWidth="2" fill="none" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              ))}
+{games.length > 0 && (
+  <div className="flex flex-col gap-2 py-2">
+    <div className="flex justify-between items-center gap-2">
+      <span className="text-gray-700 font-medium">BetWay:</span>
+      <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.betWay_code}</span>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(games[0].booking_code.betWay_code);
+          setCopiedCode('betway');
+          setTimeout(() => setCopiedCode(null), 1200);
+        }}
+        className="ml-2 p-1 rounded hover:bg-blue-100"
+        title="Copy BetWay code"
+      >
+        {copiedCode === 'betway' ? (
+          <span className="text-green-600 text-xs font-semibold">Copied!</span>
+        ) : (
+          <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+          </svg>
+        )}
+      </button>
+    </div>
+
+    <div className="flex justify-between items-center gap-2">
+      <span className="text-gray-700 font-medium">SportyBet:</span>
+      <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.sportyBet_code}</span>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(games[0].booking_code.sportyBet_code);
+          setCopiedCode('sportybet');
+          setTimeout(() => setCopiedCode(null), 1200);
+        }}
+        className="ml-2 p-1 rounded hover:bg-blue-100"
+        title="Copy SportyBet code"
+      >
+        {copiedCode === 'sportybet' ? (
+          <span className="text-green-600 text-xs font-semibold">Copied!</span>
+        ) : (
+          <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+            <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+          </svg>
+        )}
+      </button>
+    </div>
+  </div>
+)}
+
+
             </div>
           )}
         </div>

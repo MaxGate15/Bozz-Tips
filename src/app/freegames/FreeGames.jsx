@@ -43,9 +43,6 @@ const useGames = () => {
 
         fetchData();
     }, []);
-    console.log("today", today);
-    console.log("tomorrow", tomorrow);
-    console.log("yesterday", yesterday);
 
     return { today, tomorrow, yesterday, loading, error };
 };
