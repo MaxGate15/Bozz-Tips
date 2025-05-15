@@ -3,13 +3,13 @@ import axios from "axios";
 
 const useVipGames = () => {
   const [slips, setSlips] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [load, setLoading] = useState(true);
+  const [errors, setError] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://wonit-backend.onrender.com/vipp-today");
+        const res = await axios.get("https://wonit-backend.onrender.com/vvip-today");
         setSlips(res.data);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -22,7 +22,7 @@ const useVipGames = () => {
     fetchData();
   }, []);
 
-  return { slips, loading, error };
+  return { slips, load, errors };
 };
 
 export default useVipGames;

@@ -5,7 +5,7 @@ import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
-
+import useVipGames from '../freegames/VipGames';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -35,6 +35,7 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
+const { slips,load,errors } = useVipGames();
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -102,7 +103,7 @@ useEffect(() => {
 //   return `${year}-${month}-${day}`;
 // };
 
-console.log('Games:', games);
+console.log('Games:', slips);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
