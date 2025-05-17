@@ -5,7 +5,8 @@ import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
-
+import useVipGames from '../freegames/VipGames';
+import { s } from 'framer-motion/client';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -19,12 +20,21 @@ const PredictionsPage:React.FC = () => {
     odd: string;
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
+type Slip = {
+  games: Game[];
+  match_day: string;
+  price: string;
+  slip_id: number;
+  start_time: string;
+  total_odd: string;
+}
 // type VVIPGame = {
 
 // }
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+const [VipSlips, setSlips] = useState<Slip[]>([]);
 const [games, setGames] = useState<Game[]>([])
 const [day, setDay] = useState('today');
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
@@ -35,6 +45,7 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading, error } = useGames();
+const { slips,load,errors } = useVipGames();
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -57,6 +68,12 @@ useEffect(() => {
     setGames(yesterday);
   }
 }, [selectedDay, today, tomorrow, yesterday]);
+useEffect(() => {
+  setSlips(slips);
+})
+
+  // Fetch VVIP games when the component mounts
+
 
 // const formatDate = (date: Date) => {
 //   return date.toLocaleDateString('en-US', {
@@ -102,7 +119,7 @@ useEffect(() => {
 //   return `${year}-${month}-${day}`;
 // };
 
-console.log('Games:', games);
+console.log('Games:', slips);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -292,152 +309,59 @@ console.log('Games:', games);
           <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VVIP</h2>
           <div className="max-w-6xl mx-auto">
             <div className="grid grid-cols-3 gap-8">
-              {/* Column 1 */}
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="text-blue-600 text-sm mb-6">05/01, 07:02 AM</div>
-                <div className="space-y-4">
-                  {[
-                    ["Zhejiang FC", "Changchun Yatai"],
-                    ["Shandong Taisha...", "Qingdao Haini..."],
-                    ["Shanghai Port FC", "Beijing Guoan"],
-                    ["Club Brugge", "Gent"],
-                    ["SK Super Nova", "Riga FC"],
-                    ["Rosenborg BK", "Kristiansund BK"],
-                    ["Viborg FF", "Copenhagen"],
-                    ["Nottingham Forest", "Brentford FC"],
-                    ["Tottenham", "Bodoe/Glimt"],
-                    ["Djurgardens IF", "Chelsea"]
-                  ].map(([team1, team2], index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-gray-700 text-sm">{team1}</span>
-                      <span className="text-gray-500 text-sm">vs</span>
-                      <span className="text-gray-700 text-sm">{team2}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6">
-                  <button
-                    ref={vvipBtnRefs[0]}
-                    className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
-                    onClick={() => setOpenVvipPopover(0)}
-                  >
-                    10.03 ODDS ($4.00)
-                  </button>
-                  <LocationPopover
-                    isOpen={openVvipPopover === 0}
-                    onClose={() => setOpenVvipPopover(null)}
-                    anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
-                  />
-                </div>
+  {/* Column 1 */}
+  {VipSlips.length === 0 ? (
+    <p className="text-center text-red-500 font-semibold">
+      No VVIP games available for Today.
+    </p>
+  ) : (
+    VipSlips.map((slip, slipIndex) => (
+      <div key={slip.slip_id} className="bg-white p-6 rounded-lg shadow-sm">
+        <div className="text-blue-600 text-sm mb-6">
+          {slip.match_day}, {slip.start_time}
+        </div>
+        <div className="space-y-4">
+          {slip.games.map((game, gameIndex) => (
+            <div key={game.game_id} className="bg-gray-50 p-3 rounded-lg">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-gray-700 text-sm">{game.team1}</span>
+                <span className="text-gray-500 text-sm">vs</span>
+                <span className="text-gray-700 text-sm">{game.team2}</span>
               </div>
-
-              {/* Column 2 */}
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="text-blue-600 text-sm mb-6">05/01, 07:01 AM</div>
-                <div className="space-y-4">
-                  {[
-                    ["Club Brugge", "Gent"],
-                    ["Rosenborg BK", "Kristiansund BK"],
-                    ["Tottenham", "Bodoe/Glimt"],
-                    ["Djurgardens IF", "Chelsea"]
-                  ].map(([team1, team2], index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-gray-700 text-sm">{team1}</span>
-                      <span className="text-gray-500 text-sm">vs</span>
-                      <span className="text-gray-700 text-sm">{team2}</span>
-                    </div>
-                  ))}
+              <div className="flex justify-between items-center">
+                <div className="bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-gray-600 text-sm">
+                    Prediction: {game.prediction}
+                  </span>
                 </div>
-                <div className="mt-6">
-                  <button
-                    ref={vvipBtnRefs[1]}
-                    className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
-                    onClick={() => setOpenVvipPopover(1)}
-                  >
-                    67.86 ODDS ($20.00)
-                  </button>
-                  <LocationPopover
-                    isOpen={openVvipPopover === 1}
-                    onClose={() => setOpenVvipPopover(null)}
-                    anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
-                  />
-                </div>
-              </div>
-
-              {/* Column 3 */}
-              <div className="bg-white p-6 rounded-lg shadow-sm">
-                <div className="text-blue-600 text-sm mb-6">05/01, 12:00 AM</div>
-                <div className="space-y-4">
-                  {[
-                    {
-                      team1: "Ethiopian Coffe...",
-                      team2: "Dire Dawa Ken...",
-                      option: "Home",
-                      odds: "1.86"
-                    },
-                    {
-                      team1: "Hawke's Bay Hawks",
-                      team2: "Whai",
-                      option: "Home",
-                      odds: "2.98"
-                    },
-                    {
-                      team1: "Moutet, Corentin",
-                      team2: "Kotov, Pavel",
-                      option: "Home",
-                      odds: "2.83"
-                    },
-                    {
-                      team1: "Walton, Adam",
-                      team2: "Rachmazov, Alibek",
-                      option: "Away",
-                      odds: "1.27"
-                    },
-                    {
-                      team1: "Nam Ji / Yuzu...",
-                      team2: "Bayldon B / Stald...",
-                      option: "Home",
-                      odds: "1.27"
-                    }
-                  ].map((match, index) => (
-                    <div key={index} className="bg-gray-50 p-3 rounded-lg">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-700 text-sm">{match.team1}</span>
-                        <span className="text-gray-500 text-sm">vs</span>
-                        <span className="text-gray-700 text-sm">{match.team2}</span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div className="bg-gray-100 px-2 py-1 rounded">
-                          <span className="text-gray-600 text-sm">Option: {match.option}</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="bg-gray-100 px-2 py-1 rounded">
-                            <span className="text-gray-600 text-sm">Odds: {match.odds}</span>
-                          </div>
-                          <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center justify-end">
-                  <button
-                    ref={vvipBtnRefs[2]}
-                    className="bg-blue-900 text-white text-sm py-2 px-4"
-                    onClick={() => setOpenVvipPopover(2)}
-                  >
-                    1.00 ODDS ($33.33)
-                  </button>
-                  <LocationPopover
-                    isOpen={openVvipPopover === 2}
-                    onClose={() => setOpenVvipPopover(null)}
-                    anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
-                  />
-                </div>
+                {game.odd && (
+                  <div className="bg-gray-100 px-2 py-1 rounded">
+                    <span className="text-gray-600 text-sm">Odds: {game.odd}</span>
+                  </div>
+                )}
               </div>
             </div>
+          ))}
+        </div>
+        <div className="mt-6">
+          <button
+            ref={vvipBtnRefs[slipIndex]}
+            className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
+            onClick={() => setOpenVvipPopover(slipIndex)}
+          >
+            {slip.total_odd} ODDS (${slip.price})
+          </button>
+          <LocationPopover
+            isOpen={openVvipPopover === slipIndex}
+            onClose={() => setOpenVvipPopover(null)}
+            anchorRef={vvipBtnRefs[slipIndex] as React.RefObject<HTMLButtonElement>}
+          />
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
           </div>
         </div>
 
