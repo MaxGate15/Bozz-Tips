@@ -22,6 +22,14 @@ export default function Navbar() {
   const [auth, setAuth] = useState(false);
   const [username, setUsername] = useState('');
   const [isNotifOpen, setIsNotifOpen] = useState(false);
+  const [selectedNotif, setSelectedNotif] = useState<{
+    id: number;
+    title: string;
+    body: string;
+    date: string;
+  } | null>(null);
+  const [showNotifModal, setShowNotifModal] = useState(false);
+  const [expandedNotifId, setExpandedNotifId] = useState<number | null>(null);
   const notifications = [
     { id: 1, title: 'Games Updated', body: 'New games have been added for today!', date: '2024-06-01' },
     { id: 2, title: 'Welcome!', body: 'Welcome to Bozz Tips! Enjoy your stay.', date: '2024-05-30' },
@@ -63,10 +71,9 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 bg-white shadow-sm z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-16">
-          <Link href="/" className="text-2xl font-bold text-blue-900">
+          <Link href="/" className="text-3xl font-extrabold text-blue-900">
             Bozz Tips
           </Link>
-
           <div className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-gray-600 hover:text-blue-900">Home</Link>
             <Link href="/predictions" className="text-gray-600 hover:text-blue-900">Predictions</Link>
@@ -94,10 +101,23 @@ export default function Navbar() {
                         <div className="px-4 py-4 text-gray-500">No notifications</div>
                       ) : (
                         notifications.map((notif) => (
-                          <div key={notif.id} className="px-4 py-3 border-b last:border-b-0 hover:bg-blue-50">
-                            <div className="font-bold text-blue-800">{notif.title}</div>
-                            <div className="text-gray-700 text-sm">{notif.body}</div>
-                            <div className="text-gray-400 text-xs mt-1">{notif.date}</div>
+                          <div
+                            key={notif.id}
+                            className={`px-4 py-3 border-b last:border-b-0 hover:bg-blue-50 cursor-pointer ${expandedNotifId === notif.id ? 'bg-blue-50' : ''}`}
+                            onClick={() => setExpandedNotifId(expandedNotifId === notif.id ? null : notif.id)}
+                          >
+                            <div className="font-bold text-blue-800 flex justify-between items-center">
+                              {notif.title}
+                              <span className="ml-2 text-lg text-gray-400">{expandedNotifId === notif.id ? '\u25B2' : '\u25BC'}</span>
+                            </div>
+                            {expandedNotifId === notif.id ? (
+                              <>
+                                <div className="text-gray-700 text-sm mt-2 mb-1">{notif.body}</div>
+                                <div className="text-gray-400 text-xs">{notif.date}</div>
+                              </>
+                            ) : (
+                              <div className="text-gray-700 text-sm truncate">{notif.body}</div>
+                            )}
                           </div>
                         ))
                       )}

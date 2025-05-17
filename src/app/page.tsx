@@ -45,23 +45,38 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[90vh] bg-gradient-to-br from-blue-900 to-blue-700">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-white text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">Bozz Tips Games</h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-2xl">
-            Get in touch with our daily amazing games, we post free predictions, HT/FT games and
-            many more, join us now and don't miss out on our next winning
-          </p>
+      <section className="relative h-[90vh] flex items-center justify-center">
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src="/bozzmain.png.png"
+            alt="Bozz Tips Games Background"
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
+        <div className="relative z-20 flex flex-col items-center">
+          {/* The logo is part of the background image, so nothing else here */}
+        </div>
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 w-full max-w-2xl px-4 flex flex-col items-center text-white text-center z-10">
           <div className="flex gap-4 flex-col sm:flex-row">
             <Link
-              href="/vvip"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!(session || isAuthenticated() || getToken())) {
+                  window.location.href = '/login';
+                } else {
+                  window.location.href = '/vvip';
+                }
+              }}
               className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
             >
               JOIN VVIP
             </Link>
             <Link
-              href="/telegram"
+              href="https://t.me/wassce_bece_2024"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white text-blue-900 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Join Telegram Channel
@@ -186,14 +201,30 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-      <section className="py-20 bg-blue-900 text-white">
-        <div className="container mx-auto px-4 text-center">
+      <section className="py-28 bg-blue-900 text-white relative" style={{ background: 'none' }}>
+        <div className="absolute inset-0 w-full h-full">
+          <img
+            src="/bozz.png.png"
+            alt="Join Us Now Background"
+            className="w-full h-full object-cover object-top"
+            style={{ filter: 'brightness(0.5)' }}
+          />
+        </div>
+        <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center min-h-[350px]">
           <h2 className="text-3xl md:text-4xl font-bold mb-8">Join Us Now</h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto text-blue-100">
             Join over 10,000 people who win every single day. Our games are categorized for every aspect including free daily games. Don't miss out on this chance of winning big.
           </p>
           <Link
-            href="/vvip"
+            href="#"
+            onClick={(e) => {
+              e.preventDefault();
+              if (!(session || isAuthenticated() || getToken())) {
+                window.location.href = '/login';
+              } else {
+                window.location.href = '/vvip';
+              }
+            }}
             className="inline-block bg-blue-500 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-600 transition-colors"
           >
             Join VVIP Now
