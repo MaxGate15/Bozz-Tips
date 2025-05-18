@@ -40,7 +40,7 @@ const [day, setDay] = useState('today');
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
 const buyPlanBtnRef = React.useRef<HTMLButtonElement>(null);
-const [openVvipPopover, setOpenVvipPopover] = useState<number | null>(null);
+const [openVvipPopover, setOpenVvipPopover] = useState<string | null>(null);
 const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null)];
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
@@ -260,8 +260,13 @@ console.log('Games:', slips);
           <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
           <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-4 text-blue-900">DAILY VIP PLAN</h3>
-              <div className="text-blue-600 text-3xl font-bold mb-6">$2.67</div>
+              <h3 className="text-xl font-bold mb-4 text-blue-900 text-center">DAILY VIP PLAN</h3>
+              <div className="flex justify-center mb-2">
+                <span className="inline-block px-4 py-1 rounded-full border border-green-500 bg-green-100 text-green-600 font-bold text-sm">
+                  Available
+                </span>
+              </div>
+              <div className="text-blue-600 text-3xl font-bold mb-6 text-center">$2.67</div>
               <ul className="space-y-3">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,86 +309,162 @@ console.log('Games:', slips);
           </div>
         </div>
 
-        {/* VVIP Section */}
+        {/* VVIP Plans Section (added below VIP) */}
         <div className="mt-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VVIP</h2>
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-3 gap-8">
-  {/* Column 1 */}
-  {VipSlips.length === 0 ? (
-    <p className="text-center text-red-500 font-semibold">
-      No VVIP games available for Today.
-    </p>
-  ) : (
-    VipSlips.map((slip, slipIndex) => (
-      <div key={slip.slip_id} className="bg-white p-6 rounded-lg shadow-sm">
-        <div className="text-blue-600 text-sm mb-6">
-          {slip.match_day}, {slip.start_time}
-        </div>
-        <div className="space-y-4">
-          {slip.games.map((game, gameIndex) => (
-            <div key={game.game_id} className="bg-gray-50 p-3 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-gray-700 text-sm">{game.team1}</span>
-                <span className="text-gray-500 text-sm">vs</span>
-                <span className="text-gray-700 text-sm">{game.team2}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <div className="bg-gray-100 px-2 py-1 rounded">
-                  <span className="text-gray-600 text-sm">
-                    Prediction: {game.prediction}
-                  </span>
-                </div>
-                {game.odd && (
-                  <div className="bg-gray-100 px-2 py-1 rounded">
-                    <span className="text-gray-600 text-sm">Odds: {game.odd}</span>
-                  </div>
-                )}
+          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+            {/* DAILY VVIP PLAN */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
+                <div className="text-red-600 text-3xl font-bold mb-6">$4.00</div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Daily VVIP Package
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Telegram Support
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Access to VVIP Tips
+                  </li>
+                </ul>
+                <button
+                  ref={vvipBtnRefs[0]}
+                  onClick={() => setOpenVvipPopover('daily')}
+                  className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
+                >
+                  SELECT PLAN
+                </button>
+                <LocationPopover
+                  isOpen={openVvipPopover === 'daily'}
+                  onClose={() => setOpenVvipPopover(null)}
+                  anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
+                />
               </div>
             </div>
-          ))}
-        </div>
-        <div className="mt-6">
-          <button
-            ref={vvipBtnRefs[slipIndex]}
-            className="bg-blue-900 text-white text-sm py-2 px-4 w-full"
-            onClick={() => setOpenVvipPopover(slipIndex)}
-          >
-            {slip.total_odd} ODDS (${slip.price})
-          </button>
-          <LocationPopover
-            isOpen={openVvipPopover === slipIndex}
-            onClose={() => setOpenVvipPopover(null)}
-            anchorRef={vvipBtnRefs[slipIndex] as React.RefObject<HTMLButtonElement>}
-          />
-        </div>
-      </div>
-    ))
-  )}
-</div>
-
+            {/* DAILY VVIP PLAN 2 */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
+                <div className="text-red-600 text-3xl font-bold mb-6">$20.00</div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Daily VVIP Package 2
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Premium Telegram Access
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Access to VVIP Tips
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Priority Support
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Half Time/Full Time
+                  </li>
+                </ul>
+                <button
+                  ref={vvipBtnRefs[1]}
+                  onClick={() => setOpenVvipPopover('weekly')}
+                  className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
+                >
+                  SELECT PLAN
+                </button>
+                <LocationPopover
+                  isOpen={openVvipPopover === 'weekly'}
+                  onClose={() => setOpenVvipPopover(null)}
+                  anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
+                />
+              </div>
+            </div>
+            {/* DAILY VVIP PLAN 3 */}
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
+                <div className="text-red-600 text-3xl font-bold mb-6">$33.33</div>
+                <ul className="space-y-3 mb-6">
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Daily VVIP Package 3
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    VIP Telegram Group
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Access to VVIP Tips
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    24/7 Premium Support
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Exclusive Analysis
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Correct Score
+                  </li>
+                </ul>
+                <button
+                  ref={vvipBtnRefs[2]}
+                  onClick={() => setOpenVvipPopover('monthly')}
+                  className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
+                >
+                  SELECT PLAN
+                </button>
+                <LocationPopover
+                  isOpen={openVvipPopover === 'monthly'}
+                  onClose={() => setOpenVvipPopover(null)}
+                  anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Correct Score Section */}
-        <div className="mt-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">Correct score</h2>
-          <div className="max-w-4xl mx-auto">
-            <div className="text-blue-600 text-sm mb-4">05/01, 12:00 AM</div>
-            <button
-              ref={correctScoreBtnRef}
-              className="bg-blue-900 text-white text-lg font-medium py-3 px-12 block mx-auto hover:bg-blue-800 transition-colors"
-              onClick={() => setIsCorrectScorePopoverOpen(true)}
-            >
-              1.00 ODDS ($33.33)
-            </button>
-            <LocationPopover
-              isOpen={isCorrectScorePopoverOpen}
-              onClose={() => setIsCorrectScorePopoverOpen(false)}
-              anchorRef={correctScoreBtnRef as React.RefObject<HTMLButtonElement>}
-            />
-          </div>
-        </div>
+        {/* Removed as requested */}
       </div>
     </div>
   );

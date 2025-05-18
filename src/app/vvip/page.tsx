@@ -52,7 +52,7 @@ export default function VVIPPage() {
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Access to VVIP Tips (For 1 day)
+                  Access to VVIP Tips
                 </li>
               </ul>
               <button
@@ -70,17 +70,17 @@ export default function VVIPPage() {
             </div>
           </div>
 
-          {/* Weekly Package */}
+          {/* Daily VVIP Plan 2 */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-4">WEEKLY VVIP PLAN</h3>
+              <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
               <div className="text-red-600 text-3xl font-bold mb-6">$20.00</div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Weekly VVIP Package
+                  Daily VVIP Package 2
                 </li>
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -92,13 +92,19 @@ export default function VVIPPage() {
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Access to VVIP Tips (For 7 days)
+                  Access to VVIP Tips
                 </li>
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                   Priority Support
+                </li>
+                <li className="flex items-center">
+                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Half Time/Full Time
                 </li>
               </ul>
               <button
@@ -116,17 +122,17 @@ export default function VVIPPage() {
             </div>
           </div>
 
-          {/* Monthly Package */}
+          {/* Daily VVIP Plan 3 */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
-              <h3 className="text-xl font-bold mb-4">MONTHLY VVIP PLAN</h3>
+              <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
               <div className="text-red-600 text-3xl font-bold mb-6">$33.33</div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Monthly VVIP Package
+                  Daily VVIP Package 3
                 </li>
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,7 +144,7 @@ export default function VVIPPage() {
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
-                  Access to VVIP Tips (For 30 days)
+                  Access to VVIP Tips
                 </li>
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -151,6 +157,12 @@ export default function VVIPPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                   </svg>
                   Exclusive Analysis
+                </li>
+                <li className="flex items-center">
+                  <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                  </svg>
+                  Correct Score
                 </li>
               </ul>
               <button
