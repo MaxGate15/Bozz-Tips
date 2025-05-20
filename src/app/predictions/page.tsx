@@ -4,7 +4,7 @@ import React,{ useState,useEffect, useRef } from 'react';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
-import { s } from 'framer-motion/client';
+import useUpdateCheck from '../UpdateCheck/Check';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -17,6 +17,12 @@ const PredictionsPage:React.FC = () => {
     prediction: string;
     odd: string;
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
+}
+type Update = {
+  vip:boolean;
+  vvip1:boolean;
+  vvip2:boolean;
+  vvip3:boolean;
 }
 
 // type VVIPGame = {
@@ -34,6 +40,11 @@ const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading} = useGames();
+const { updateAvailable, updatePurchase, error } = useUpdateCheck() as {
+  updateAvailable: Update | null;
+  updatePurchase: Update | null;
+  error: string | null;
+};
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -279,6 +290,7 @@ useEffect(() => {
                 </li>
               </ul>
               <button
+                disabled={!updateAvailable?.vip || updatePurchase?.vip}
                 ref={buyPlanBtnRef}
                 className="block w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center py-3 mt-6 rounded-md font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
                 onClick={() => setIsLocationPopoverOpen(true)}
@@ -325,6 +337,7 @@ useEffect(() => {
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip1 || updatePurchase?.vvip1}
                   ref={vvipBtnRefs[0]}
                   onClick={() => setOpenVvipPopover('daily')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -377,6 +390,7 @@ useEffect(() => {
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip2 || updatePurchase?.vvip2}
                   ref={vvipBtnRefs[1]}
                   onClick={() => setOpenVvipPopover('weekly')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -435,6 +449,7 @@ useEffect(() => {
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip3 || updatePurchase?.vvip3}
                   ref={vvipBtnRefs[2]}
                   onClick={() => setOpenVvipPopover('monthly')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
