@@ -1,15 +1,55 @@
 // utils/auth.js
-export const saveToken = (token) => localStorage.setItem('token', token);
-export const getToken = () => localStorage.getItem('token');
-export const removeToken = () => localStorage.removeItem('token');
 
-export const saveUsername = (username) => localStorage.setItem('username', username);
-export const getUsername = () => localStorage.getItem('username');
-export const removeUsername = () => localStorage.removeItem('username');
+export const saveToken = (token) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('token', token);
+  }
+};
 
-export const isAuthenticated = () => !!getToken();
-export const saveIsAuthenticated = (isAuthenticated) => localStorage.setItem('isAuthenticated', isAuthenticated);
-export const removeIsAuthenticated = () => localStorage.removeItem('isAuthenticated');
+export function getToken() {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+}
+
+export const removeToken = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('token');
+  }
+};
+
+export const saveUsername = (username) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('username', username);
+  }
+};
+
+export const getUsername = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('username');
+};
+
+export const removeUsername = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('username');
+  }
+};
+
+export function isAuthenticated() {
+  if (typeof window === 'undefined') return false;
+  return !!localStorage.getItem('token');
+}
+
+export const saveIsAuthenticated = (isAuthenticated) => {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('isAuthenticated', isAuthenticated);
+  }
+};
+
+export const removeIsAuthenticated = () => {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('isAuthenticated');
+  }
+};
 
 
 
