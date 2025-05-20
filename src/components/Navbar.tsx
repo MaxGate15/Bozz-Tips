@@ -20,7 +20,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [auth, setAuth] = useState(false);
-  const [username, setUsername] = useState('');
+  const  [username, setUsername] = useState('');
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState<{
     id: number;
@@ -206,3 +206,4 @@ export default function Navbar() {
     </nav>
   );
 }
+

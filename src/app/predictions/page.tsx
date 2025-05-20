@@ -1,12 +1,10 @@
 'use client';
 import Link from 'next/link';
 import React,{ useState,useEffect, useRef } from 'react';
-import axios from 'axios';
 import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
-import useVipGames from '../freegames/VipGames';
-import { s } from 'framer-motion/client';
+import useUpdateCheck from '../UpdateCheck/Check';
 
 const PredictionsPage:React.FC = () => {
   type Game = {
@@ -20,23 +18,20 @@ const PredictionsPage:React.FC = () => {
     odd: string;
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
-type Slip = {
-  games: Game[];
-  match_day: string;
-  price: string;
-  slip_id: number;
-  start_time: string;
-  total_odd: string;
+type Update = {
+  vip:boolean;
+  vvip1:boolean;
+  vvip2:boolean;
+  vvip3:boolean;
 }
+
 // type VVIPGame = {
 
 // }
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-const [VipSlips, setSlips] = useState<Slip[]>([]);
 const [games, setGames] = useState<Game[]>([])
-const [day, setDay] = useState('today');
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
 const buyPlanBtnRef = React.useRef<HTMLButtonElement>(null);
@@ -44,8 +39,12 @@ const [openVvipPopover, setOpenVvipPopover] = useState<string | null>(null);
 const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null)];
 const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
-const { today, tomorrow, yesterday, loading, error } = useGames();
-const { slips,load,errors } = useVipGames();
+const { today, tomorrow, yesterday, loading} = useGames();
+const { updateAvailable, updatePurchase, error } = useUpdateCheck() as {
+  updateAvailable: Update | null;
+  updatePurchase: Update | null;
+  error: string | null;
+};
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -68,9 +67,7 @@ useEffect(() => {
     setGames(yesterday);
   }
 }, [selectedDay, today, tomorrow, yesterday]);
-useEffect(() => {
-  setSlips(slips);
-})
+
 
   // Fetch VVIP games when the component mounts
 
@@ -119,7 +116,6 @@ useEffect(() => {
 //   return `${year}-${month}-${day}`;
 // };
 
-console.log('Games:', slips);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -294,6 +290,7 @@ console.log('Games:', slips);
                 </li>
               </ul>
               <button
+                disabled={!updateAvailable?.vip || updatePurchase?.vip}
                 ref={buyPlanBtnRef}
                 className="block w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center py-3 mt-6 rounded-md font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
                 onClick={() => setIsLocationPopoverOpen(true)}
@@ -304,6 +301,7 @@ console.log('Games:', slips);
                 isOpen={isLocationPopoverOpen}
                 onClose={() => setIsLocationPopoverOpen(false)}
                 anchorRef={buyPlanBtnRef as React.RefObject<HTMLButtonElement>}
+                game_category='vip'
               />
             </div>
           </div>
@@ -339,6 +337,7 @@ console.log('Games:', slips);
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip1 || updatePurchase?.vvip1}
                   ref={vvipBtnRefs[0]}
                   onClick={() => setOpenVvipPopover('daily')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -349,6 +348,7 @@ console.log('Games:', slips);
                   isOpen={openVvipPopover === 'daily'}
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
+                  game_category='vvip1'
                 />
               </div>
             </div>
@@ -390,6 +390,7 @@ console.log('Games:', slips);
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip2 || updatePurchase?.vvip2}
                   ref={vvipBtnRefs[1]}
                   onClick={() => setOpenVvipPopover('weekly')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -400,6 +401,7 @@ console.log('Games:', slips);
                   isOpen={openVvipPopover === 'weekly'}
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
+                  game_category='vvip2'
                 />
               </div>
             </div>
@@ -447,6 +449,7 @@ console.log('Games:', slips);
                   </li>
                 </ul>
                 <button
+                  disabled={!updateAvailable?.vvip3 || updatePurchase?.vvip3}
                   ref={vvipBtnRefs[2]}
                   onClick={() => setOpenVvipPopover('monthly')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -457,6 +460,7 @@ console.log('Games:', slips);
                   isOpen={openVvipPopover === 'monthly'}
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
+                  game_category='vvip3'
                 />
               </div>
             </div>

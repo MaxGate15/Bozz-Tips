@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { getUsername } from '../app/utils/auth';
+import { u } from 'framer-motion/client';
 
 const countries = [
   { country: 'Nigeria', code: 'NGN' },
@@ -10,6 +12,7 @@ interface LocationPopoverProps {
   isOpen: boolean;
   onClose: () => void;
   anchorRef: React.RefObject<HTMLButtonElement>;
+  game_category: string;
 }
 
 async function getRate(currencyCode: string): Promise<number> {
@@ -20,12 +23,18 @@ async function getRate(currencyCode: string): Promise<number> {
   return Math.floor(amountInLocal * 100);
 }
 
-const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anchorRef }) => {
+const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anchorRef,game_category }) => {
   const [step, setStep] = useState<'location' | 'country'>('location');
   const [selectedLocation, setSelectedLocation] = useState<'ghana' | 'not-ghana' | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const popoverRef = useRef<HTMLDivElement>(null);
+  const [username, setUsername] = useState<string>('');
+  useEffect(() => {
+    setUsername(getUsername() || '');
+  }
+  , []);
+  
 
   useEffect(() => {
     if (isOpen && anchorRef.current) {
@@ -65,6 +74,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       document.body.removeChild(script);
     };
   }, []);
+  console.log(username);
 
   const handlePayWithPaystack = async (currencyCode: string) => {
     try {
@@ -78,8 +88,9 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         metadata: {
           custom_fields: [
             {
-              display_name: 'Location',
+              display_name: {username},
               variable_name: 'location',
+              game_category: game_category,
               value: selectedCountry || (selectedLocation === 'ghana' ? 'Ghana' : ''),
             },
           ],
