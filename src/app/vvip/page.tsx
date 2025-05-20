@@ -3,12 +3,37 @@
 import { useState, useRef } from 'react';
 import LocationPopover from '../../components/LocationPopover';
 import Link from 'next/link';
+import useUpdateCheck from '../UpdateCheck/Check'
+
+
 
 export default function VVIPPage() {
   const [openPopover, setOpenPopover] = useState<string | null>(null);
   const dailyBtnRef = useRef<HTMLButtonElement>(null);
   const weeklyBtnRef = useRef<HTMLButtonElement>(null);
   const monthlyBtnRef = useRef<HTMLButtonElement>(null);
+  type Updates = {
+    vip: boolean;
+    vvip1: boolean;
+    vvip2: boolean;
+    vvip3: boolean;
+  }
+  
+  const {
+    updateAvailable,
+    updatePurchase,
+    loading,
+    error,
+  } = useUpdateCheck() as {
+    updateAvailable: Updates[] | null;
+    updatePurchase: Updates[] | null;
+    loading: boolean | null;  
+    error: string | null;
+  };
+  
+  // Provide fallback values if null
+  
+
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -58,6 +83,7 @@ export default function VVIPPage() {
               <button
                 ref={dailyBtnRef}
                 onClick={() => setOpenPopover('daily')}
+                disabled={!updateAvailable?.[0]?.vvip1 || updatePurchase?.[0]?.vvip1}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
               >
                 SELECT PLAN
@@ -109,6 +135,7 @@ export default function VVIPPage() {
                 </li>
               </ul>
               <button
+                disabled={!updateAvailable?.[0]?.vvip2 || updatePurchase?.[0]?.vvip2}
                 ref={weeklyBtnRef}
                 onClick={() => setOpenPopover('weekly')}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -168,6 +195,7 @@ export default function VVIPPage() {
                 </li>
               </ul>
               <button
+                disabled={!updateAvailable?.[0]?.vvip3 || updatePurchase?.[0]?.vvip3} 
                 ref={monthlyBtnRef}
                 onClick={() => setOpenPopover('monthly')}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
