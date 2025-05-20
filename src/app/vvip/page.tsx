@@ -66,6 +66,7 @@ export default function VVIPPage() {
                 isOpen={openPopover === 'daily'}
                 onClose={() => setOpenPopover(null)}
                 anchorRef={dailyBtnRef as React.RefObject<HTMLButtonElement>}
+                game_category='vvip1'
               />
             </div>
           </div>
@@ -118,6 +119,7 @@ export default function VVIPPage() {
                 isOpen={openPopover === 'weekly'}
                 onClose={() => setOpenPopover(null)}
                 anchorRef={weeklyBtnRef as React.RefObject<HTMLButtonElement>}
+                game_category='vvip2'
               />
             </div>
           </div>
@@ -176,6 +178,7 @@ export default function VVIPPage() {
                 isOpen={openPopover === 'monthly'}
                 onClose={() => setOpenPopover(null)}
                 anchorRef={monthlyBtnRef as React.RefObject<HTMLButtonElement>}
+                game_category='vvip3'
               />
             </div>
           </div>
