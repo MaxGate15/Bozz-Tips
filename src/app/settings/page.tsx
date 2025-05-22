@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getToken } from '../utils/auth';
+import { getToken, isAuthenticated } from '../utils/auth';
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
@@ -15,6 +15,12 @@ export default function SettingsPage() {
       router.push('/login');
     }
   }, [status, router]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isAuthenticated()) {
+      router.replace('/login');
+    }
+  }, []);
 
   if (status === 'loading') {
     return (
@@ -288,4 +294,4 @@ export default function SettingsPage() {
       </div>
     </div>
   );
-} 
+}
