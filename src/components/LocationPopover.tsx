@@ -74,7 +74,6 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       document.body.removeChild(script);
     };
   }, []);
-  console.log(username);
 
   const handlePayWithPaystack = async (currencyCode: string) => {
     try {
