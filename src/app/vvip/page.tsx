@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import LocationPopover from '../../components/LocationPopover';
 import Link from 'next/link';
 import useUpdateCheck from '../UpdateCheck/Check'
+import { useRouter } from 'next/navigation';
+import { isAuthenticated } from '../utils/auth'; // adjust path as needed
 
 
 
@@ -30,10 +32,17 @@ export default function VVIPPage() {
     loading: boolean | null;  
     error: string | null;
   };
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isAuthenticated()) {
+      router.replace('/login');
+    }
+  }, []);
   
   // Provide fallback values if null
   
-
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -214,4 +223,4 @@ export default function VVIPPage() {
       </div>
     </div>
   );
-} 
+}
