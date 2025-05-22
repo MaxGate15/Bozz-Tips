@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react';
 import axios from 'axios';
 import useCurrentVipGames from '../../freegames/VipGames'
 import usePreviousVipGames from '../../freegames/PreviousVipGames'
-
+import { useRouter } from 'next/navigation';
 
 const dateNow = {
   today: new Date().toLocaleDateString('en-US')
@@ -17,9 +17,7 @@ const dateNow = {
     .toLocaleDateString('en-US')
     .split('/')
     .reverse()
-    .join('-'),
-
-}
+    .join('-'),}
 
 // const mockCurrentVIPGames = [
 //   {
@@ -151,6 +149,13 @@ export default function VVIPGamesPage() {
     }
   }, [selectedDate]);
   const { data: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !isAuthenticated()) {
+      router.replace('/login');
+    }
+  }, []);
   console.log(selectedDate)
   return (
     <div className="min-h-screen bg-[#FFF8F0] text-black pb-12">
@@ -202,23 +207,23 @@ export default function VVIPGamesPage() {
           )}
           {vvip1Slips.length === 0  ? (
             <div >
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP1 game has been purchased yet.</div>
-            <Link
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (typeof window !== 'undefined') {
-                              if (!(session || isAuthenticated() || getToken())) {
-                                window.location.href = '/login';
-                              } else {
-                                window.location.href = '/vvip';
-                              }
-                            }
-                          }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
-                        >
-                          Buy Avalible Games Now
-                        </Link>
+              <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP1 game has been purchased yet.</div>
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    if (!(session || isAuthenticated() || getToken())) {
+                      window.location.href = '/login';
+                    } else {
+                      window.location.href = '/vvip';
+                    }
+                  }
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
+              >
+                Buy Avalible Games Now
+              </Link>
             </div>
           ) : (
             vvip1Slips.map((game: any) => (
@@ -240,23 +245,24 @@ export default function VVIPGamesPage() {
           )}
           {vvip2Slips.length === 0  ? (
             <div>
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP2 game has been purchased yet.</div>
-            <Link
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (typeof window !== 'undefined') {
-                              if (!(session || isAuthenticated() || getToken())) {
-                                window.location.href = '/login';
-                              } else {
-                                window.location.href = '/vvip';
-                              }
-                            }
-                          }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
-                        >
-                          Buy Avalible Games Now
-                        </Link></div>
+              <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP2 game has been purchased yet.</div>
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    if (!(session || isAuthenticated() || getToken())) {
+                      window.location.href = '/login';
+                    } else {
+                      window.location.href = '/vvip';
+                    }
+                  }
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
+              >
+                Buy Avalible Games Now
+              </Link>
+            </div>
           ) : (
             vvip2Slips.map((game: any) => (
               <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
@@ -277,23 +283,24 @@ export default function VVIPGamesPage() {
           )}
           {vvip3Slips.length === 0  ? (
             <div>
-            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP3 game has been purchased yet.</div>
-            <Link
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            if (typeof window !== 'undefined') {
-                              if (!(session || isAuthenticated() || getToken())) {
-                                window.location.href = '/login';
-                              } else {
-                                window.location.href = '/vvip';
-                              }
-                            }
-                          }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
-                        >
-                          Buy Avalible Games Now
-                        </Link></div>
+              <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP3 game has been purchased yet.</div>
+              <Link
+                href="#"
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (typeof window !== 'undefined') {
+                    if (!(session || isAuthenticated() || getToken())) {
+                      window.location.href = '/login';
+                    } else {
+                      window.location.href = '/vvip';
+                    }
+                  }
+                }}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-full font-semibold transition-colors"
+              >
+                Buy Avalible Games Now
+              </Link>
+            </div>
           ) : (
             vvip3Slips.map((game: any) => (
               <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
