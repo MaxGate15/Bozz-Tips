@@ -76,6 +76,11 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
   }, []);
 
   const handlePayWithPaystack = async (currencyCode: string) => {
+    // Check if user is logged in
+    if (!username) {
+      window.location.href = '/login';
+      return;
+    }
     try {
       const rate = await getRate(currencyCode);
       const isNotGhana = selectedLocation === 'not-ghana';
