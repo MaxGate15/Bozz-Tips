@@ -13,6 +13,7 @@ import {
   getToken,
 } from '../app/utils/auth'; // adjust path if necessary
 import { u } from 'framer-motion/client';
+import { FaTrash } from 'react-icons/fa';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
@@ -31,12 +32,12 @@ export default function Navbar() {
   const [showNotifModal, setShowNotifModal] = useState(false);
   const [expandedNotifId, setExpandedNotifId] = useState<number | null>(null);
   const [notifications, setNotifications] = useState([
-    { id: 1, title: 'Games Updated', body: 'New games have been added for today!', date: '2024-06-01' },
-    { id: 2, title: 'Welcome!', body: 'Welcome to Bozz Tips! Enjoy your stay.', date: '2024-05-30' },
-    { id: 3, title: 'Subscription Expiring', body: 'Your VVIP subscription expires in 2 days. Renew now!', date: '2024-06-02' },
-    { id: 4, title: 'Payment Successful', body: 'Your payment for VIP plan was successful. Enjoy your tips!', date: '2024-06-03' },
-    { id: 5, title: 'New Feature', body: 'Check out our new calendar date picker for predictions!', date: '2024-06-04' },
-    { id: 6, title: 'Account Update', body: 'Your account details were updated successfully.', date: '2024-06-05' },
+    { id: 1, title: 'Games Updated', body: 'New games have been added for today!', date: '2024-06-01', read: false },
+    { id: 2, title: 'Welcome!', body: 'Welcome to Bozz Tips! Enjoy your stay.', date: '2024-05-30', read: false },
+    { id: 3, title: 'Subscription Expiring', body: 'Your VVIP subscription expires in 2 days. Renew now!', date: '2024-06-02', read: false },
+    { id: 4, title: 'Payment Successful', body: 'Your payment for VIP plan was successful. Enjoy your tips!', date: '2024-06-03', read: false },
+    { id: 5, title: 'New Feature', body: 'Check out our new calendar date picker for predictions!', date: '2024-06-04', read: false },
+    { id: 6, title: 'Account Update', body: 'Your account details were updated successfully.', date: '2024-06-05', read: false },
   ]);
 
   const notifDropdownRef = useRef<HTMLDivElement>(null);
@@ -108,43 +109,62 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                     {/* Badge for unread notifications */}
-                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{notifications.length}</span>
+                    <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{notifications.filter(n => !n.read).length}</span>
                   </button>
                   {isNotifOpen && (
                     <div ref={notifDropdownRef} className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-2 z-50 border border-blue-100">
-                      <div className="px-4 py-2 font-semibold text-blue-900 border-b">Notifications</div>
+                      <div className="px-4 py-2 font-semibold text-blue-900 border-b flex justify-between items-center">
+                        <span>Notifications</span>
+                        {notifications.length > 0 && (
+                          <button
+                            className="text-xs text-red-600 hover:underline focus:outline-none"
+                            onClick={() => setNotifications([])}
+                          >
+                            Clear All
+                          </button>
+                        )}
+                      </div>
                       {notifications.length === 0 ? (
                         <div className="px-4 py-4 text-gray-500">No notifications</div>
                       ) : (
-                        notifications.map((notif) => (
-                          <div
-                            key={notif.id}
-                            className={`px-4 py-3 border-b last:border-b-0 hover:bg-blue-50 cursor-pointer ${expandedNotifId === notif.id ? 'bg-blue-50' : ''}`}
-                            onClick={() => setExpandedNotifId(expandedNotifId === notif.id ? null : notif.id)}
-                          >
-                            <div className="font-bold text-blue-800 flex justify-between items-center">
-                              {notif.title}
-                            </div>
-                            {expandedNotifId === notif.id ? (
-                              <>
-                                <div className="text-gray-700 text-sm mt-2 mb-1">{notif.body}</div>
-                                <div className="text-gray-400 text-xs mb-2">{notif.date}</div>
+                        notifications.map((notif) => {
+                          const isExpanded = expandedNotifId === notif.id;
+                          return (
+                            <div
+                              key={notif.id}
+                              className={`px-4 py-3 border-b last:border-b-0 hover:bg-blue-50 cursor-pointer ${isExpanded ? 'bg-blue-50' : ''}`}
+                              onClick={() => {
+                                setExpandedNotifId(isExpanded ? null : notif.id);
+                                if (!notif.read && !isExpanded) {
+                                  setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                                }
+                              }}
+                            >
+                              <div className="flex justify-between items-center">
+                                <div className={`font-bold ${notif.read ? 'text-gray-500' : 'text-blue-800'}`}>{notif.title}</div>
                                 <button
-                                  className="text-xs text-white bg-blue-600 px-3 py-1 rounded hover:bg-blue-700"
+                                  className="ml-2 text-red-500 hover:text-red-700 focus:outline-none"
                                   onClick={e => {
                                     e.stopPropagation();
                                     setNotifications(prev => prev.filter(n => n.id !== notif.id));
-                                    setExpandedNotifId(null);
+                                    if (expandedNotifId === notif.id) setExpandedNotifId(null);
                                   }}
+                                  title="Delete notification"
                                 >
-                                  Mark as Read
+                                  <FaTrash />
                                 </button>
-                              </>
-                            ) : (
-                              <div className="text-gray-700 text-sm truncate">{notif.body}</div>
-                            )}
-                          </div>
-                        ))
+                              </div>
+                              {isExpanded ? (
+                                <>
+                                  <div className="text-gray-700 text-sm mt-2 mb-1">{notif.body}</div>
+                                  <div className="text-gray-400 text-xs">{notif.date}</div>
+                                </>
+                              ) : (
+                                <div className="text-gray-700 text-sm truncate">{notif.body}</div>
+                              )}
+                            </div>
+                          );
+                        })
                       )}
                     </div>
                   )}
