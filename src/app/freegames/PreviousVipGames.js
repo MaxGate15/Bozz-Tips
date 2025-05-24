@@ -16,7 +16,7 @@ const usePreviousVipGames = () => {
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const res = await axios.get("https://wonit-backend.onrender.com/previous-purchased-games/", {
+            const res = await axios.get("https://bozz-tips-backend.onrender.com/previous-purchased-games/", {
             headers: { "X-Username": username },
             });
     
