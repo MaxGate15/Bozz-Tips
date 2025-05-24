@@ -13,8 +13,8 @@ const useUpdateCheck = () => {
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const [updates,userPurchase] = await Promise.all([axios.get("https://wonit-backend.onrender.com/check-today/",            ),
-            axios.get("https://wonit-backend.onrender.com/check-user-purchases/",{
+            const [updates,userPurchase] = await Promise.all([axios.get("https://bozz-tips-backend.onrender.com/check-today/",            ),
+            axios.get("https://bozz-tips-backend.onrender.com/check-user-purchases/",{
             headers: { "X-Username": username },})]);
     
             
