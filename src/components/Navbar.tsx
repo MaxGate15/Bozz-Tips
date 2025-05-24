@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   getUsername,
@@ -30,10 +30,16 @@ export default function Navbar() {
   } | null>(null);
   const [showNotifModal, setShowNotifModal] = useState(false);
   const [expandedNotifId, setExpandedNotifId] = useState<number | null>(null);
-  const notifications = [
+  const [notifications, setNotifications] = useState([
     { id: 1, title: 'Games Updated', body: 'New games have been added for today!', date: '2024-06-01' },
     { id: 2, title: 'Welcome!', body: 'Welcome to Bozz Tips! Enjoy your stay.', date: '2024-05-30' },
-  ];
+    { id: 3, title: 'Subscription Expiring', body: 'Your VVIP subscription expires in 2 days. Renew now!', date: '2024-06-02' },
+    { id: 4, title: 'Payment Successful', body: 'Your payment for VIP plan was successful. Enjoy your tips!', date: '2024-06-03' },
+    { id: 5, title: 'New Feature', body: 'Check out our new calendar date picker for predictions!', date: '2024-06-04' },
+    { id: 6, title: 'Account Update', body: 'Your account details were updated successfully.', date: '2024-06-05' },
+  ]);
+
+  const notifDropdownRef = useRef<HTMLDivElement>(null);
 
   const checkAuth = () => {
     // Authenticated if NextAuth session exists or custom token exists
@@ -49,6 +55,16 @@ export default function Navbar() {
     checkAuth();
   }, [pathname, status, session]);
   
+  useEffect(() => {
+    if (!isNotifOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isNotifOpen]);
 
   const handleSignOut = () => {
     removeToken();
@@ -95,7 +111,7 @@ export default function Navbar() {
                     <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full px-1.5 py-0.5">{notifications.length}</span>
                   </button>
                   {isNotifOpen && (
-                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-2 z-50 border border-blue-100">
+                    <div ref={notifDropdownRef} className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg py-2 z-50 border border-blue-100">
                       <div className="px-4 py-2 font-semibold text-blue-900 border-b">Notifications</div>
                       {notifications.length === 0 ? (
                         <div className="px-4 py-4 text-gray-500">No notifications</div>
@@ -108,12 +124,21 @@ export default function Navbar() {
                           >
                             <div className="font-bold text-blue-800 flex justify-between items-center">
                               {notif.title}
-                              <span className="ml-2 text-lg text-gray-400">{expandedNotifId === notif.id ? '\u25B2' : '\u25BC'}</span>
                             </div>
                             {expandedNotifId === notif.id ? (
                               <>
                                 <div className="text-gray-700 text-sm mt-2 mb-1">{notif.body}</div>
-                                <div className="text-gray-400 text-xs">{notif.date}</div>
+                                <div className="text-gray-400 text-xs mb-2">{notif.date}</div>
+                                <button
+                                  className="text-xs text-white bg-blue-600 px-3 py-1 rounded hover:bg-blue-700"
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    setNotifications(prev => prev.filter(n => n.id !== notif.id));
+                                    setExpandedNotifId(null);
+                                  }}
+                                >
+                                  Mark as Read
+                                </button>
                               </>
                             ) : (
                               <div className="text-gray-700 text-sm truncate">{notif.body}</div>

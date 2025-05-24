@@ -5,6 +5,9 @@ import LocationModal from '../../components/LocationModal';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
 import useUpdateCheck from '../UpdateCheck/Check';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { FaRegCalendarAlt } from 'react-icons/fa';
 
 
 const PredictionsPage:React.FC = () => {
@@ -49,7 +52,7 @@ const { updateAvailable, updatePurchase, error } = useUpdateCheck() as {
 
 // const [selectedDate, setSelectedDate] = useState(new Date());
 
-const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow'>('today');
+const [selectedDay, setSelectedDay] = useState<'yesterday' | 'today' | 'tomorrow' | 'other'>('today');
 const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
 const bookingBtnRef = useRef<HTMLButtonElement>(null);
 // const bookingCodes = [
@@ -57,17 +60,25 @@ const bookingBtnRef = useRef<HTMLButtonElement>(null);
 //   { site: 'Betway', code: '123647' },
 // ];
 const [copiedCode, setCopiedCode] = useState<string | null>(null);
+const [selectedDate, setSelectedDate] = useState<string>("");
+const [showDatePicker, setShowDatePicker] = useState(false);
+const [calendarDate, setCalendarDate] = useState<Date | null>(null);
 
 useEffect(() => {
-  // Update the game list based on selected day
   if (selectedDay === 'today') {
     setGames(today);
   } else if (selectedDay === 'tomorrow') {
     setGames(tomorrow);
   } else if (selectedDay === 'yesterday') {
     setGames(yesterday);
+  } else if (selectedDay === 'other' && selectedDate) {
+    // Fetch games for the selected date
+    fetch(`/api/games?date=${selectedDate}`)
+      .then(res => res.json())
+      .then(data => setGames(data))
+      .catch(() => setGames([]));
   }
-}, [selectedDay, today, tomorrow, yesterday]);
+}, [selectedDay, today, tomorrow, yesterday, selectedDate]);
 
 
   // Fetch VVIP games when the component mounts
@@ -128,7 +139,7 @@ useEffect(() => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Date Navigation */}
-        <div className="flex justify-center space-x-4 mb-8">
+        <div className="flex justify-center space-x-4 mb-8 items-center">
           {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
             <button
               key={day}
@@ -136,11 +147,48 @@ useEffect(() => {
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
                 } transition-colors`}
-              onClick={() => setSelectedDay(day)}
+              onClick={() => { setSelectedDay(day); setSelectedDate(""); setCalendarDate(null); }}
             >
               {day.charAt(0).toUpperCase() + day.slice(1)}
             </button>
           ))}
+          <div className="relative flex items-center ml-4">
+            <button
+              className="p-2 border border-blue-300 rounded-full bg-white hover:bg-blue-50 focus:outline-none"
+              onClick={() => setShowDatePicker((prev) => !prev)}
+              aria-label="Pick a date"
+            >
+              <FaRegCalendarAlt className="text-blue-600 text-xl" />
+            </button>
+            {showDatePicker && (
+              <>
+                {/* Overlay to close popover when clicking outside */}
+                <div
+                  className="fixed inset-0 z-40 bg-transparent"
+                  onClick={() => setShowDatePicker(false)}
+                />
+                <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-4">
+                  <DatePicker
+                    selected={calendarDate}
+                    onChange={(date: Date | null) => {
+                      setCalendarDate(date);
+                      setShowDatePicker(false);
+                      if (date) {
+                        const formatted = date.toISOString().split('T')[0];
+                        setSelectedDate(formatted);
+                        setSelectedDay('other');
+                      }
+                    }}
+                    maxDate={new Date()}
+                    inline
+                    showMonthDropdown
+                    showYearDropdown
+                    dropdownMode="select"
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Title */}
