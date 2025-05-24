@@ -74,11 +74,16 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       document.body.removeChild(script);
     };
   }, []);
-  console.log(username);
 
   const handlePayWithPaystack = async (currencyCode: string) => {
+    // Check if user is logged in
+    if (!username) {
+      window.location.href = '/login';
+      return;
+    }
     try {
       const rate = await getRate(currencyCode);
+      const isNotGhana = selectedLocation === 'not-ghana';
       const handler = (window as any).PaystackPop.setup({
         key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
         email: 'Kofiokolobaah@gmail.com',
@@ -88,13 +93,14 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         metadata: {
           custom_fields: [
             {
-              display_name: {username},
+              display_name: { username },
               variable_name: 'location',
               game_category: game_category,
               value: selectedCountry || (selectedLocation === 'ghana' ? 'Ghana' : ''),
             },
           ],
         },
+        ...(isNotGhana && { payment_channels: ['card'] }), // Only allow card if not in Ghana
         callback: function (response: any) {
           alert('Payment successful! Reference: ' + response.reference);
           onClose();

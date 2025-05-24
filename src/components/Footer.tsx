@@ -40,39 +40,15 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/testimonials" className="text-gray-300 hover:text-red-500">
-                  TESTIMONIES
+                <Link href="/predictions" className="text-gray-300 hover:text-red-500">
+                  PREDICTIONS 
                 </Link>
               </li>
             </ul>
           </div>
 
           {/* Predictions */}
-          <div>
-            <h3 className="text-xl font-bold mb-4">PREDICTIONS</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/predictions/football" className="text-gray-300 hover:text-red-500">
-                  FOOTBALL
-                </Link>
-              </li>
-              <li>
-                <Link href="/predictions/ht-ft" className="text-gray-300 hover:text-red-500">
-                  HT/FT
-                </Link>
-              </li>
-              <li>
-                <Link href="/predictions/over-under" className="text-gray-300 hover:text-red-500">
-                  OVER/UNDER
-                </Link>
-              </li>
-              <li>
-                <Link href="/predictions/correct-score" className="text-gray-300 hover:text-red-500">
-                  CORRECT SCORE
-                </Link>
-              </li>
-            </ul>
-          </div>
+          
 
           {/* Social Media Links */}
           <div>
