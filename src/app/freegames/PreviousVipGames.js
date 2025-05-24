@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { getUsername } from "../utils/auth";
 
+
+
 const usePreviousVipGames = () => {
     const [allPSlips, setAllSlips] = useState([]);
     const [vipPSlips, setVipSlips] = useState([]);
