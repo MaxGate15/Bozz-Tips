@@ -78,8 +78,9 @@ export default function DashboardPage() {
 	const [visible, setVisible] = useState(false);
 	const [showPurchasedDropdown, setShowPurchasedDropdown] = useState(false);
 	const [expandedPurchaseId, setExpandedPurchaseId] = useState<number | null>(null);
-	const { allPSlips} = usePurchasedGames() as {
-		allPSlips:Slip[]
+	const { allPSlips,recentGames} = usePurchasedGames() as {
+		allPSlips:Slip[],
+		recentGames: Slip[];
 
 	};
 
@@ -183,7 +184,7 @@ export default function DashboardPage() {
 													>
 														<div>
 															<div className="font-semibold text-blue-900 flex items-center">
-																Slip #{slip.slip_id}
+																{slip.category.toUpperCase()} Game
 																<span className="ml-2 text-xs text-gray-400">{expandedPurchaseId === slip.slip_id ? '\u25B2' : '\u25BC'}</span>
 															</div>
 															<div className="text-gray-600 text-sm">{slip.date_created}</div>
@@ -220,55 +221,38 @@ export default function DashboardPage() {
 					<div className="p-6">
 						<h3 className="text-xl font-bold text-gray-900 mb-6">Recent Activity</h3>
 						<div className="space-y-6">
-							{[
-								{
-									type: 'prediction',
-									teams: 'Manchester United vs Arsenal',
-									prediction: 'Over 2.5',
-									date: '2024-03-01',
-									status: 'won'
-								},
-								{
-									type: 'subscription',
-									action: 'Renewed VVIP subscription',
-									date: '2024-02-28',
-									status: 'completed'
-								},
-								{
-									type: 'prediction',
-									teams: 'Real Madrid vs Barcelona',
-									prediction: 'Home Win',
-									date: '2024-02-27',
-									status: 'won'
-								}
-							].map((activity, index) => (
-								<div key={index} className="flex items-center justify-between border-b border-gray-100 pb-4">
-									<div>
-										<p className="font-medium text-gray-900">
-											{activity.type === 'prediction' ? (
-												<>
-													{activity.teams}
-													<span className="text-gray-600 ml-2">({activity.prediction})</span>
-												</>
-											) : (
-												activity.action
-											)}
-										</p>
-										<p className="text-sm text-gray-600">{activity.date}</p>
-									</div>
-									<div>
-										{activity.status === 'won' ? (
-											<span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-												Won
-											</span>
-										) : (
-											<span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-												Completed
-											</span>
-										)}
-									</div>
-								</div>
-							))}
+							{recentGames.length === 0 ? (
+								<div className="text-gray-500 text-center py-8">No recent activity yet.</div>
+							) : (
+								recentGames.map((slip) =>
+									slip.games.map((game, gameIdx) => (
+										<div key={`${slip.slip_id}-${gameIdx}`} className="flex items-center justify-between border-b border-gray-100 pb-4">
+											<div>
+												<p className="font-medium text-gray-900">
+													{game.team1} vs {game.team2}
+													<span className="text-gray-600 ml-2">({game.prediction})</span>
+												</p>
+												<p className="text-sm text-gray-600">{slip.date_created}</p>
+											</div>
+											<div>
+												{game.result === 'won' ? (
+													<span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+														Won
+													</span>
+												) : game.result === 'lost' ? (
+													<span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
+														Lost
+													</span>
+												) : (
+													<span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+														Pending
+													</span>
+												)}
+											</div>
+										</div>
+									))
+								)
+							)}
 						</div>
 					</div>
 				</div>
