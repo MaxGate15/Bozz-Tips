@@ -33,14 +33,14 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Black Header */}
-      <div className="bg-black py-6 sm:py-8">
-        <div className="container mx-auto px-2 sm:px-4">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white text-center">Account Settings</h1>
+      <div className="bg-black py-8">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">Account Settings</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
-        <div className="max-w-full sm:max-w-4xl mx-auto">
+      <div className="container mx-auto px-4 py-12">
+        <div className="max-w-4xl mx-auto">
           {/* Settings Navigation */}
           <div className="bg-white rounded-lg shadow-md mb-8">
             <div className="border-b">

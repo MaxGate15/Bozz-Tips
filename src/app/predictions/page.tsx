@@ -131,28 +131,28 @@ useEffect(() => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-700 py-6 sm:py-8">
-        <div className="container mx-auto px-2 sm:px-4">
-          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white text-center">PREDICTIONS</h1>
+      <div className="bg-gradient-to-r from-blue-900 to-blue-700 py-8">
+        <div className="container mx-auto px-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">PREDICTIONS</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <div className="container mx-auto px-4 py-8">
         {/* Date Navigation */}
-        <div className="flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-2 sm:space-y-0 mb-6 sm:mb-8 items-center">
+        <div className="flex justify-center space-x-4 mb-8 items-center">
           {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
             <button
               key={day}
-              className={`px-4 sm:px-8 py-2 rounded-full border-2 ${selectedDay === day
+              className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
-                } transition-colors text-sm sm:text-base`}
+                } transition-colors`}
               onClick={() => { setSelectedDay(day); setSelectedDate(""); setCalendarDate(null); }}
             >
               {day.charAt(0).toUpperCase() + day.slice(1)}
             </button>
           ))}
-          <div className="relative flex items-center sm:ml-4 mt-2 sm:mt-0">
+          <div className="relative flex items-center ml-4">
             <button
               className="p-2 border border-blue-300 rounded-full bg-white hover:bg-blue-50 focus:outline-none"
               onClick={() => setShowDatePicker((prev) => !prev)}
@@ -167,7 +167,7 @@ useEffect(() => {
                   className="fixed inset-0 z-40 bg-transparent"
                   onClick={() => setShowDatePicker(false)}
                 />
-                <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-2 sm:p-4">
+                <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-4">
                   <DatePicker
                     selected={calendarDate}
                     onChange={(date: Date | null) => {
@@ -192,15 +192,15 @@ useEffect(() => {
         </div>
 
         {/* Title */}
-        <div className="text-center mb-6 sm:mb-8">
-          <h2 className="text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4 text-blue-900">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
             Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
           </h2>
-          <p className="text-gray-600 text-sm sm:text-base">Here are our predictions for {selectedDay}.</p>
+          <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
         </div>
 
         {/* Free Predictions List */}
-        <div className="max-w-full sm:max-w-4xl mx-auto space-y-2 sm:space-y-4 mb-8 sm:mb-12">
+        <div className="max-w-4xl mx-auto space-y-4 mb-12">
           {loading ? (
             <p className="text-center text-gray-500">Loading games...</p>
           ) : games.length === 0 ? (
@@ -209,21 +209,21 @@ useEffect(() => {
             games.map((match, index) => (
               <div
                 key={index}
-                className="bg-white border-b border-gray-100 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-2 sm:px-6"
+                className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
               >
-                <div className="flex flex-row sm:flex-row items-center space-x-4 sm:space-x-8 w-full sm:w-auto mb-2 sm:mb-0">
-                  <div className="w-20 sm:w-24 text-blue-600">
-                    <div className="font-semibold text-xs sm:text-base">{match.date_created}</div>
-                    <div className="text-xs sm:text-sm">{match.time_created}</div>
+                <div className="flex items-center space-x-8">
+                  <div className="w-24 text-blue-600">
+                    <div className="font-semibold">{match.date_created}</div>
+                    <div className="text-sm">{match.time_created}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-xs sm:text-sm mb-1">{match.game_type}</div>
-                    <div className="font-medium text-gray-900 text-sm sm:text-base">{match.team1} vs {match.team2}</div>
+                    <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
+                    <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                  <span className="text-gray-600 text-sm sm:text-base">{match.prediction}</span>
-                  <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-yellow-300"></div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-gray-600">{match.prediction}</span>
+                  <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
                 </div>
               </div>
             ))
@@ -231,20 +231,20 @@ useEffect(() => {
         </div>
 
         {/* Booking Code Section */}
-        <div className="text-center mt-6 sm:mt-8 relative">
+        <div className="text-center mt-8 relative">
           <button
             ref={bookingBtnRef}
-            className="bg-blue-600 text-white px-4 sm:px-8 py-2 sm:py-3 uppercase font-semibold text-sm sm:text-base hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors"
             onClick={() => setIsBookingPopoverOpen((open) => !open)}
           >
             GET BOOKING CODE
           </button>
           {isBookingPopoverOpen && (
             <div
-              className="absolute left-1/2 -translate-x-1/2 mt-2 w-60 sm:w-64 bg-white border border-blue-200 rounded-lg shadow-lg z-50 p-2 sm:p-4"
+              className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-blue-200 rounded-lg shadow-lg z-50 p-4"
               style={{ top: '100%' }}
             >
-              <div className="font-bold text-blue-900 mb-2 text-sm sm:text-base">Booking Codes</div>
+              <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
 {games.length > 0 && (
   <div className="flex flex-col gap-2 py-2">
     <div className="flex justify-between items-center gap-2">
@@ -301,18 +301,18 @@ useEffect(() => {
         </div>
 
         {/* VIP Section */}
-        <div className="mt-10 sm:mt-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-12 text-blue-900">VIP</h2>
-          <div className="max-w-xs sm:max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-4 sm:p-6">
-              <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-4 text-blue-900 text-center">DAILY VIP PLAN</h3>
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
+          <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="p-6">
+              <h3 className="text-xl font-bold mb-4 text-blue-900 text-center">DAILY VIP PLAN</h3>
               <div className="flex justify-center mb-2">
-                <span className="inline-block px-3 sm:px-4 py-1 rounded-full border border-green-500 bg-green-100 text-green-600 font-bold text-xs sm:text-sm">
+                <span className="inline-block px-4 py-1 rounded-full border border-green-500 bg-green-100 text-green-600 font-bold text-sm">
                   Available
                 </span>
               </div>
-              <div className="text-blue-600 text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-center">$2.67</div>
-              <ul className="space-y-2 sm:space-y-3">
+              <div className="text-blue-600 text-3xl font-bold mb-6 text-center">$2.67</div>
+              <ul className="space-y-3">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
@@ -341,7 +341,7 @@ useEffect(() => {
               <button
                 disabled={!updateAvailable?.vip || updatePurchase?.vip}
                 ref={buyPlanBtnRef}
-                className="block w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center py-2 sm:py-3 mt-4 sm:mt-6 rounded-md font-semibold hover:from-blue-800 hover:to-blue-950 transition-all text-sm sm:text-base"
+                className="block w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white text-center py-3 mt-6 rounded-md font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
                 onClick={() => setIsLocationPopoverOpen(true)}
               >
                 BUY PLAN
@@ -357,9 +357,9 @@ useEffect(() => {
         </div>
 
         {/* VVIP Plans Section (added below VIP) */}
-        <div className="mt-10 sm:mt-20">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-12 text-blue-900">VVIP PLANS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-full sm:max-w-6xl mx-auto">
+        <div className="mt-20">
+          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* DAILY VVIP PLAN */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
@@ -400,7 +400,7 @@ useEffect(() => {
                   game_category='vvip1'
                 />
               </div>
-            </div>
+                </div>
             {/* DAILY VVIP PLAN 2 */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
@@ -497,22 +497,22 @@ useEffect(() => {
                     Correct Score
                   </li>
                 </ul>
-                <button
+          <button
                   disabled={!updateAvailable?.vvip3 || updatePurchase?.vvip3}
                   ref={vvipBtnRefs[2]}
                   onClick={() => setOpenVvipPopover('monthly')}
                   className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
                 >
                   SELECT PLAN
-                </button>
-                <LocationPopover
+          </button>
+          <LocationPopover
                   isOpen={openVvipPopover === 'monthly'}
-                  onClose={() => setOpenVvipPopover(null)}
+            onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip3'
-                />
-              </div>
-            </div>
+          />
+        </div>
+      </div>
           </div>
         </div>
 

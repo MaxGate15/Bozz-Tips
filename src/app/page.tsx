@@ -56,51 +56,54 @@ const Home: React.FC = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[250px] sm:min-h-[350px] md:min-h-[500px] flex items-center justify-center">
+      <section className="relative h-[60vh] sm:h-[90vh] flex items-center justify-center overflow-hidden">
+        {/* Mobile gradient overlay for hero section, hidden on desktop */}
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-blue-900 to-black sm:hidden z-0" />
         <div className="absolute inset-0 w-full h-full">
           <img
             src="/bozzmain.png.png"
             alt="Bozz Tips Games Background"
-            className="w-full h-full object-contain object-center"
-            style={{ maxHeight: '500px' }}
+            className="w-full h-full object-contain sm:object-cover object-center"
           />
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-black/60 z-10" />
         </div>
-        <div className="relative z-20 flex flex-col items-center">
+        <div className="relative z-20 flex flex-col items-center w-full px-4 sm:px-0">
           {/* The logo is part of the background image, so nothing else here */}
         </div>
-        <div className="absolute bottom-6 sm:bottom-10 left-1/2 transform -translate-x-1/2 w-full max-w-lg sm:max-w-2xl px-2 sm:px-4 flex flex-col sm:flex-row items-center gap-3 sm:gap-4 text-white text-center z-10">
-          <Link
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              if (!(session || isAuthenticated() || getToken())) {
-                window.location.href = '/login';
-              } else {
-                window.location.href = '/vvip';
-              }
-            }}
-            className="bg-blue-500 hover:bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold transition-colors w-full sm:w-auto"
-          >
-            JOIN VVIP
-          </Link>
-          <Link
-            href="https://t.me/wassce_bece_2024"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-white text-blue-900 px-6 sm:px-8 py-2 sm:py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors w-full sm:w-auto"
-          >
-            Join Telegram Channel
-          </Link>
+        <div className="absolute bottom-2 sm:bottom-10 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-2xl px-3 flex flex-col items-center text-white text-center z-30 bg-transparent py-6 mt-8 sm:py-6 sm:mt-8">
+          <div className="flex flex-row justify-center gap-4 w-full">
+            <Link
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                if (!(session || isAuthenticated() || getToken())) {
+                  window.location.href = '/login';
+                } else {
+                  window.location.href = '/vvip';
+                }
+              }}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full font-bold transition-colors min-w-[140px] text-center"
+            >
+              JOIN VVIP
+            </Link>
+            <Link
+              href="https://t.me/wassce_bece_2024"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white text-blue-900 px-4 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors min-w-[140px] text-center"
+            >
+              Join Telegram Channel
+            </Link>
+          </div>
         </div>
       </section>
       {/* ... (unchanged) ... */}
 
       {/* Predictions Timeline */}
-      <section className="py-8 sm:py-12 bg-gray-50">
-        <div className="container mx-auto px-2 sm:px-4">
+      <section className="py-6 sm:py-12">
+        <div className="container mx-auto px-4 sm:px-4">
           {/* Date Navigation */}
-          <div className="flex flex-col sm:flex-row justify-center sm:space-x-4 space-y-2 sm:space-y-0 mb-6 sm:mb-8 items-center">
+          <div className="flex justify-center space-x-2 sm:space-x-4 mb-6 sm:mb-8 items-center overflow-x-auto">
             {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
               <button
                 key={day}
@@ -113,7 +116,7 @@ const Home: React.FC = () => {
                 {day.charAt(0).toUpperCase() + day.slice(1)}
               </button>
             ))}
-            <div className="relative flex items-center sm:ml-4 mt-2 sm:mt-0">
+            <div className="relative flex items-center ml-2 sm:ml-4">
               <button
                 className="p-2 border border-blue-300 rounded-full bg-white hover:bg-blue-50 focus:outline-none"
                 onClick={() => setShowDatePicker((prev) => !prev)}
@@ -128,7 +131,7 @@ const Home: React.FC = () => {
                     className="fixed inset-0 z-40 bg-transparent"
                     onClick={() => setShowDatePicker(false)}
                   />
-                  <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-2 sm:p-4">
+                  <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-4">
                     <DatePicker
                       selected={calendarDate}
                       onChange={(date: Date | null) => {
@@ -154,14 +157,14 @@ const Home: React.FC = () => {
 
           {/* Title */}
           <div className="text-center mb-6 sm:mb-8">
-            <h2 className="text-lg sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4 text-blue-900">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-4 text-blue-900">
               Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
             </h2>
             <p className="text-gray-600 text-sm sm:text-base">Here are our predictions for {selectedDay}.</p>
           </div>
 
           {/* Predictions List */}
-          <div className="max-w-full sm:max-w-4xl mx-auto space-y-2 sm:space-y-4">
+          <div className="max-w-4xl mx-auto">
           {loading ? (
               <p className="text-center text-gray-500">Loading games...</p>
             ) : games.length === 0 ? (
@@ -170,30 +173,30 @@ const Home: React.FC = () => {
               games.map((match, index) => (
                 <div
                   key={index}
-                  className="bg-white border-b border-gray-100 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-2 sm:px-6"
+                  className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
-                  <div className="flex flex-row sm:flex-row items-center space-x-4 sm:space-x-8 w-full sm:w-auto mb-2 sm:mb-0">
-                    <div className="w-20 sm:w-24 text-blue-600">
-                      <div className="font-semibold text-xs sm:text-base">{match.date_created}</div>
-                      <div className="text-xs sm:text-sm">{match.time_created}</div>
+                  <div className="flex items-center space-x-8">
+                    <div className="w-24 text-blue-600">
+                      <div className="font-semibold">{match.date_created}</div>
+                      <div className="text-sm">{match.time_created}</div>
                     </div>
                     <div>
-                      <div className="text-gray-500 text-xs sm:text-sm mb-1">{match.game_type}</div>
-                      <div className="font-medium text-gray-900 text-sm sm:text-base">{match.team1} vs {match.team2}</div>
+                      <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
+                      <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                    <span className="text-gray-600 text-sm sm:text-base">{match.prediction}</span>
-                    <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full bg-yellow-300"></div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-gray-600">{match.prediction}</span>
+                    <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
                   </div>
                 </div>
               ))
             )}
 
             {/* Unlock More Button */}
-            <div className="text-center mt-8 sm:mt-12">
+            <div className="text-center mt-12">
               <button
-                className="inline-block bg-blue-900 text-white px-8 sm:px-12 py-2 sm:py-3 uppercase font-semibold hover:bg-blue-800 transition-colors text-sm sm:text-base"
+                className="inline-block bg-blue-900 text-white px-12 py-3 uppercase font-semibold hover:bg-blue-800 transition-colors"
                 onClick={() => {
                   if (!(session || isAuthenticated() || getToken())) {
                     window.location.href = '/login';
@@ -208,10 +211,10 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-      <section className="py-20 bg-blue-900">
+      <section className="py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-white">Why Us?</h2>
-          <p className="text-center text-blue-100 max-w-2xl mx-auto mb-16">
+          <p className="text-center text-blue-900 max-w-2xl mx-auto mb-16">
             We have 90% win ratio so far, our games are well organized and taken from the best sources. 
             We value our clients first, and we've managed to satisfy every single customer.
           </p>
@@ -232,34 +235,20 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* Categories Section */}
-      <section className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-16 text-blue-900">Our Predictions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {['Football', 'HT/FT', 'Over/Under', 'Correct Score'].map((category) => (
-              <div key={category} className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                <h3 className="text-xl font-semibold mb-4 text-blue-900">{category}</h3>
-                <p className="text-gray-600">
-                  Professional {category.toLowerCase()} predictions with high accuracy rates.
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-      <section className="py-20 bg-blue-900 text-white relative">
+      <section className="py-28 bg-blue-900 text-white relative" style={{ background: 'none' }}>
+        {/* Mobile gradient overlay for Join Us Now section, hidden on desktop */}
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-b from-blue-900 to-black sm:hidden z-0" />
         <div className="absolute inset-0 w-full h-full">
           <img
             src="/bozz.png.png"
             alt="Join Us Now Background"
-            className="w-full h-full object-contain object-top"
-            style={{ maxHeight: '350px' }}
+            className="w-full h-full object-contain sm:object-cover object-center sm:object-top min-h-[400px]"
+            style={{ filter: 'brightness(0.5)' }}
           />
         </div>
-        <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center min-h-[350px]">
-          <h2 className="text-3xl md:text-4xl font-bold mb-8">Join Us Now</h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto text-blue-100">
+        <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center min-h-[350px] py-12 sm:py-0">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 sm:mb-8">Join Us Now</h2>
+          <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-xs sm:max-w-2xl mx-auto text-blue-100">
             Join over 10,000 people who win every single day. Our games are categorized for every aspect including free daily games. Don't miss out on this chance of winning big.
           </p>
           <Link
@@ -280,7 +269,7 @@ const Home: React.FC = () => {
       </section>
 
       {/* Footer Info Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center text-gray-600">
             <p className="mb-6">
@@ -292,8 +281,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
-      {/* ... Other sections unchanged ... */}
 
       {/* Debug Info */}
       {/* <div style={{ background: '#fee', color: '#900', padding: '1rem', margin: '1rem 0', borderRadius: '8px' }}>
