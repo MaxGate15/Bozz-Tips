@@ -58,15 +58,15 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Black Header */}
-      <div className="bg-black py-8">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">Create Account</h1>
+      <div className="bg-black py-6 sm:py-8">
+        <div className="container mx-auto px-2 sm:px-4">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white text-center">Create Account</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="p-8">
+      <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
+        <div className="max-w-xs sm:max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="p-4 sm:p-8">
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-gray-700">

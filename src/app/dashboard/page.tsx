@@ -114,16 +114,16 @@ export default function DashboardPage() {
 	return (
 		<div className={`min-h-screen bg-gray-50 transition-opacity duration-500 ${visible ? 'opacity-100' : 'opacity-0'}`}>
 			{/* Black Header */}
-			<div className="bg-black py-6">
-				<div className="container mx-auto px-4 flex justify-between items-center">
-					<h1 className="text-3xl font-bold text-white">My Dashboard</h1>
+			<div className="bg-black py-6 sm:py-8">
+				<div className="container mx-auto px-2 sm:px-4 flex flex-col sm:flex-row justify-between items-center gap-2 sm:gap-0">
+					<h1 className="text-2xl sm:text-3xl font-bold text-white">My Dashboard</h1>
 				</div>
 			</div>
 
-			<div className="container mx-auto px-4 py-12">
+			<div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
 				{/* User Info Section */}
-				<div className="bg-white rounded-lg shadow-md p-6 mb-8">
-					<div className="flex items-center space-x-4">
+				<div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-8">
+					<div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4">
 						{session?.user?.image ? (
 							<img
 								src={session.user.image}

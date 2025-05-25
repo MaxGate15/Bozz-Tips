@@ -47,23 +47,23 @@ export default function VVIPPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Black Header */}
-      <div className="bg-blue-900 py-8">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">VVIP</h1>
+      <div className="bg-blue-900 py-6 sm:py-8">
+        <div className="container mx-auto px-2 sm:px-4">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white text-center">VVIP</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
         {/* Title Section */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl font-bold mb-4">VVIP</h2>
-          <p className="text-gray-600 text-lg">
+        <div className="text-center mb-10 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-4">VVIP</h2>
+          <p className="text-gray-600 text-base sm:text-lg">
             Select a package to enjoy from today's VVIP games.
           </p>
         </div>
 
         {/* Packages Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 max-w-full sm:max-w-6xl mx-auto">
           {/* Daily Package */}
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">

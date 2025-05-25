@@ -160,10 +160,10 @@ export default function VVIPGamesPage() {
   return (
     <div className="min-h-screen bg-[#FFF8F0] text-black pb-12">
       {/* Blue Gradient Banner */}
-      <div className="w-full h-40 bg-gradient-to-r from-blue-900 to-blue-600 flex items-center justify-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-bold text-white tracking-wide">VVIP/VIP GAMES</h1>
+      <div className="w-full h-28 sm:h-40 bg-gradient-to-r from-blue-900 to-blue-600 flex items-center justify-center mb-8 sm:mb-12">
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-white tracking-wide">VVIP/VIP GAMES</h1>
       </div>
-      <div className="max-w-3xl mx-auto px-4">
+      <div className="max-w-full sm:max-w-3xl mx-auto px-2 sm:px-4">
         {/* Current Purchased Games */}
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4 text-orange-500 uppercase tracking-wide">Current Purchased Games</h2>

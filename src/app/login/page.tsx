@@ -47,8 +47,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-8 sm:py-12 px-2 sm:px-4 lg:px-8">
+      <div className="max-w-xs sm:max-w-md w-full space-y-8 bg-white p-4 sm:p-8 rounded-lg shadow-md">
         {error && (
           <div className="mb-4 p-4 bg-red-50 border-l-4 border-red-500 text-red-700">
             <p>{error}</p>
