@@ -40,9 +40,9 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    signIn('google', { callbackUrl: '/' });
-  };
+  // const handleGoogleSignIn = () => {
+  //   signIn('google', { callbackUrl: '/' });
+  // };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -54,7 +54,7 @@ export default function LoginPage() {
         )}
 
         {/* Google Sign In Button */}
-        <button
+        {/* <button
           onClick={handleGoogleSignIn}
           className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
@@ -76,8 +76,8 @@ export default function LoginPage() {
               fill="#EA4335"
             />
           </svg>
-          Sign in with Google
-        </button>
+          Sign in with Google */}
+        {/* </button> */}
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
