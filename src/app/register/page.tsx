@@ -26,7 +26,7 @@ export default function RegisterPage() {
     e.preventDefault();
     // TODO: Implement registration logic
     try {
-      const response = await fetch('https://bozz-tips-backend.onrender.com/api/signup/', {
+      const response = await fetch('https://bozztips-app-57hce.ondigitalocean.app/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

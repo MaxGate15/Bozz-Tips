@@ -126,7 +126,7 @@ export default function VVIPGamesPage() {
       const username = getUsername();
       try {
         
-        const response = await axios.get('https://bozz-tips-backend.onrender.com/goto-purchased-games/', {
+        const response = await axios.get('https://bozztips-app-57hce.ondigitalocean.app/goto-purchased-games/', {
           headers: {
             'Content-Type': 'application/json',
             'x-username': username,

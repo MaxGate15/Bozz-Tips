@@ -10,7 +10,7 @@ const useNotifications = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get('https://bozz-tips-backend.onrender.com/notifications/');
+                const res = await axios.get('https://bozztips-app-57hce.ondigitalocean.app/notifications/');
                 // Only set notifications where seen is false
                 setNotifications(res.data.filter(n => n.seen === false));
             } catch (err) {

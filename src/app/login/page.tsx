@@ -24,7 +24,7 @@ export default function LoginPage() {
       password: password,
     };
     try {
-      const response = await axios.post('https://bozz-tips-backend.onrender.com/api/token/', userDetails);
+      const response = await axios.post('https://bozztips-app-57hce.ondigitalocean.app/api/token/', userDetails);
       const { access } = response.data;
   
       saveToken(access);
