@@ -103,7 +103,6 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         ...(isNotGhana && { payment_channels: ['card'] }), // Only allow card if not in Ghana
         callback: function (response: any) {
           alert('Payment successful! Reference: ' + response.reference);
-          window.location.href='/vvip/games/'
           onClose();
         },
         onClose: function () {

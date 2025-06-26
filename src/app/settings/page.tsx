@@ -34,20 +34,20 @@ export default function SettingsPage() {
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Black Header */}
       <div className="bg-black py-8">
-        <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">Account Settings</h1>
+        <div className="container mx-auto px-2 sm:px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white text-center">Account Settings</h1>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-2 sm:px-4 py-8 sm:py-12">
         <div className="max-w-4xl mx-auto">
           {/* Settings Navigation */}
           <div className="bg-white rounded-lg shadow-md mb-8">
-            <div className="border-b">
-              <nav className="flex -mb-px">
+            <div className="border-b overflow-x-auto">
+              <nav className="flex flex-col sm:flex-row -mb-px">
                 <button
                   onClick={() => setActiveTab('profile')}
-                  className={`py-4 px-6 text-sm font-medium ${
+                  className={`py-3 px-4 sm:py-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap ${
                     activeTab === 'profile'
                       ? 'border-b-2 border-red-600 text-red-600'
                       : 'text-gray-500 hover:text-gray-700'
@@ -57,7 +57,7 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('subscription')}
-                  className={`py-4 px-6 text-sm font-medium ${
+                  className={`py-3 px-4 sm:py-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap ${
                     activeTab === 'subscription'
                       ? 'border-b-2 border-red-600 text-red-600'
                       : 'text-gray-500 hover:text-gray-700'
@@ -67,7 +67,7 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('notifications')}
-                  className={`py-4 px-6 text-sm font-medium ${
+                  className={`py-3 px-4 sm:py-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap ${
                     activeTab === 'notifications'
                       ? 'border-b-2 border-red-600 text-red-600'
                       : 'text-gray-500 hover:text-gray-700'
@@ -77,7 +77,7 @@ export default function SettingsPage() {
                 </button>
                 <button
                   onClick={() => setActiveTab('security')}
-                  className={`py-4 px-6 text-sm font-medium ${
+                  className={`py-3 px-4 sm:py-4 sm:px-6 text-xs sm:text-sm font-medium whitespace-nowrap ${
                     activeTab === 'security'
                       ? 'border-b-2 border-red-600 text-red-600'
                       : 'text-gray-500 hover:text-gray-700'

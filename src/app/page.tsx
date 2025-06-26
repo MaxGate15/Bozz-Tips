@@ -8,6 +8,7 @@ import { useSession } from 'next-auth/react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaRegCalendarAlt } from 'react-icons/fa';
+import AnimatedCounter from '../components/Animatedcounter';
 
 type Game = {
   game_id: number;
@@ -71,7 +72,7 @@ const Home: React.FC = () => {
           {/* The logo is part of the background image, so nothing else here */}
         </div>
         <div className="absolute bottom-2 sm:bottom-10 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-2xl px-3 flex flex-col items-center text-white text-center z-30 bg-transparent py-6 mt-8 sm:py-6 sm:mt-8">
-          <div className="flex flex-row justify-center gap-4 w-full">
+          <div className="flex flex-wrap justify-center items-center gap-4 gap-y-2">
             <Link
               href="#"
               onClick={(e) => {
@@ -82,7 +83,7 @@ const Home: React.FC = () => {
                   window.location.href = '/vvip';
                 }
               }}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-full font-bold transition-colors min-w-[140px] text-center"
+              className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-3 rounded-full font-bold transition-colors min-w-[100px] sm:min-w-[140px] text-center text-sm sm:text-base"
             >
               JOIN VVIP
             </Link>
@@ -90,7 +91,7 @@ const Home: React.FC = () => {
               href="https://t.me/wassce_bece_2024"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white text-blue-900 px-4 py-3 rounded-full font-bold hover:bg-gray-100 transition-colors min-w-[140px] text-center"
+              className="bg-white text-blue-900 px-3 py-2 sm:px-4 sm:py-3 rounded-full font-bold hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[140px] text-center text-sm sm:text-base"
             >
               Join Telegram Channel
             </Link>
@@ -126,29 +127,32 @@ const Home: React.FC = () => {
               </button>
               {showDatePicker && (
                 <>
-                  {/* Overlay to close popover when clicking outside */}
+                  {/* Overlay */}
                   <div
-                    className="fixed inset-0 z-40 bg-transparent"
+                    className="fixed inset-0 z-50 bg-black/40"
                     onClick={() => setShowDatePicker(false)}
                   />
-                  <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-4">
-                    <DatePicker
-                      selected={calendarDate}
-                      onChange={(date: Date | null) => {
-                        setCalendarDate(date);
-                        setShowDatePicker(false);
-                        if (date) {
-                          const formatted = date.toISOString().split('T')[0];
-                          setSelectedDate(formatted);
-                          setSelectedDay('other');
-                        }
-                      }}
-                      maxDate={new Date()}
-                      inline
-                      showMonthDropdown
-                      showYearDropdown
-                      dropdownMode="select"
-                    />
+                  {/* Centered Modal */}
+                  <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div className="bg-white border border-blue-200 rounded-lg shadow-lg p-4 w-[95vw] max-w-xs sm:w-auto sm:max-w-none pointer-events-auto">
+                      <DatePicker
+                        selected={calendarDate}
+                        onChange={(date: Date | null) => {
+                          setCalendarDate(date);
+                          setShowDatePicker(false);
+                          if (date) {
+                            const formatted = date.toISOString().split('T')[0];
+                            setSelectedDate(formatted);
+                            setSelectedDay('other');
+                          }
+                        }}
+                        maxDate={new Date()}
+                        inline
+                        showMonthDropdown
+                        showYearDropdown
+                        dropdownMode="select"
+                      />
+                    </div>
                   </div>
                 </>
               )}
@@ -215,20 +219,20 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-white">Why Us?</h2>
           <p className="text-center text-blue-900 max-w-2xl mx-auto mb-16">
-            We have 90% win ratio so far, our games are well organized and taken from the best sources. 
+            We have <AnimatedCounter target={96} duration={5000} />% win ratio so far, our games are well organized and taken from the best sources. 
             We value our clients first, and we've managed to satisfy every single customer.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-              <div className="text-4xl font-bold text-blue-600 mb-2">10,000+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2"><AnimatedCounter target={10000} duration={5000} />+</div>
               <div className="text-gray-600">Subscribers</div>
             </div>
             <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-              <div className="text-4xl font-bold text-blue-600 mb-2">90%</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2"><AnimatedCounter target={96} duration={5000} />%</div>
               <div className="text-gray-600">Win Ratio</div>
             </div>
             <div className="text-center p-6 bg-white rounded-lg shadow-sm">
-              <div className="text-4xl font-bold text-blue-600 mb-2">6,500+</div>
+              <div className="text-4xl font-bold text-blue-600 mb-2"><AnimatedCounter target={6500} duration={5000} />+</div>
               <div className="text-gray-600">Predictions</div>
             </div>
           </div>
@@ -249,7 +253,7 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 text-center relative z-10 flex flex-col items-center justify-center min-h-[350px] py-12 sm:py-0">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 sm:mb-8">Join Us Now</h2>
           <p className="text-base sm:text-xl mb-6 sm:mb-8 max-w-xs sm:max-w-2xl mx-auto text-blue-100">
-            Join over 10,000 people who win every single day. Our games are categorized for every aspect including free daily games. Don't miss out on this chance of winning big.
+            Join over <AnimatedCounter target={10000} duration={5000} />+ people who win every single day. Our games are categorized for every aspect including free daily games. Don't miss out on this chance of winning big.
           </p>
           <Link
             href="#"

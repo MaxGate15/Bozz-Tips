@@ -41,7 +41,7 @@ const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
 const buyPlanBtnRef = React.useRef<HTMLButtonElement>(null);
 const [openVvipPopover, setOpenVvipPopover] = useState<string | null>(null);
 const vvipBtnRefs = [useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null), useRef<HTMLButtonElement>(null)];
-const [isCorrectScorePopoverOpen, setIsCorrectScorePopoverOpen] = useState(false);
+const [isCorrectScorePopoverOpen, setIsCorrectScorePopover] = useState(false);
 const correctScoreBtnRef = useRef<HTMLButtonElement>(null);
 const { today, tomorrow, yesterday, loading} = useGames();
 const { updateAvailable, updatePurchase, error } = useUpdateCheck() as {
@@ -137,13 +137,13 @@ useEffect(() => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-8">
         {/* Date Navigation */}
-        <div className="flex justify-center space-x-4 mb-8 items-center">
+        <div className="flex flex-wrap justify-center gap-2 sm:space-x-4 mb-8 items-center">
           {(['yesterday', 'today', 'tomorrow'] as const).map((day) => (
             <button
               key={day}
-              className={`px-8 py-2 rounded-full border-2 ${selectedDay === day
+              className={`px-4 py-2 sm:px-8 rounded-full border-2 text-xs sm:text-base ${selectedDay === day
                 ? 'bg-blue-500 text-white border-blue-500'
                 : 'border-blue-500 text-blue-900 hover:bg-blue-500 hover:text-white'
                 } transition-colors`}
@@ -152,7 +152,7 @@ useEffect(() => {
               {day.charAt(0).toUpperCase() + day.slice(1)}
             </button>
           ))}
-          <div className="relative flex items-center ml-4">
+          <div className="relative flex items-center ml-0 sm:ml-4 mt-2 sm:mt-0">
             <button
               className="p-2 border border-blue-300 rounded-full bg-white hover:bg-blue-50 focus:outline-none"
               onClick={() => setShowDatePicker((prev) => !prev)}
@@ -161,46 +161,49 @@ useEffect(() => {
               <FaRegCalendarAlt className="text-blue-600 text-xl" />
             </button>
             {showDatePicker && (
-              <>
-                {/* Overlay to close popover when clicking outside */}
-                <div
-                  className="fixed inset-0 z-40 bg-transparent"
-                  onClick={() => setShowDatePicker(false)}
-                />
-                <div className="absolute z-50 mt-2 left-1/2 -translate-x-1/2 bg-white border border-blue-200 rounded-lg shadow-lg p-4">
-                  <DatePicker
-                    selected={calendarDate}
-                    onChange={(date: Date | null) => {
-                      setCalendarDate(date);
-                      setShowDatePicker(false);
-                      if (date) {
-                        const formatted = date.toISOString().split('T')[0];
-                        setSelectedDate(formatted);
-                        setSelectedDay('other');
-                      }
-                    }}
-                    maxDate={new Date()}
-                    inline
-                    showMonthDropdown
-                    showYearDropdown
-                    dropdownMode="select"
+                <>
+                  {/* Overlay */}
+                  <div
+                    className="fixed inset-0 z-50 bg-black/40"
+                    onClick={() => setShowDatePicker(false)}
                   />
-                </div>
-              </>
-            )}
+                  {/* Centered Modal */}
+                  <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
+                    <div className="bg-white border border-blue-200 rounded-lg shadow-lg p-4 w-[95vw] max-w-xs sm:w-auto sm:max-w-none pointer-events-auto">
+                      <DatePicker
+                        selected={calendarDate}
+                        onChange={(date: Date | null) => {
+                          setCalendarDate(date);
+                          setShowDatePicker(false);
+                          if (date) {
+                            const formatted = date.toISOString().split('T')[0];
+                            setSelectedDate(formatted);
+                            setSelectedDay('other');
+                          }
+                        }}
+                        maxDate={new Date()}
+                        inline
+                        showMonthDropdown
+                        showYearDropdown
+                        dropdownMode="select"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
           </div>
         </div>
 
         {/* Title */}
         <div className="text-center mb-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 text-blue-900">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-blue-900">
             Football Matches Predictions for {selectedDay.charAt(0).toUpperCase() + selectedDay.slice(1)}
           </h2>
-          <p className="text-gray-600">Here are our predictions for {selectedDay}.</p>
+          <p className="text-gray-600 text-sm sm:text-base">Here are our predictions for {selectedDay}.</p>
         </div>
 
         {/* Free Predictions List */}
-        <div className="max-w-4xl mx-auto space-y-4 mb-12">
+        <div className="max-w-full sm:max-w-4xl mx-auto space-y-4 mb-12">
           {loading ? (
             <p className="text-center text-gray-500">Loading games...</p>
           ) : games.length === 0 ? (
@@ -209,20 +212,20 @@ useEffect(() => {
             games.map((match, index) => (
               <div
                 key={index}
-                className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                className="bg-white border-b border-gray-100 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-2 sm:px-6"
               >
-                <div className="flex items-center space-x-8">
-                  <div className="w-24 text-blue-600">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 w-full">
+                  <div className="w-full sm:w-24 text-blue-600 flex flex-row sm:flex-col justify-between sm:justify-start">
                     <div className="font-semibold">{match.date_created}</div>
                     <div className="text-sm">{match.time_created}</div>
                   </div>
                   <div>
-                    <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
-                    <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                    <div className="text-gray-500 text-xs sm:text-sm mb-1">{match.game_type}</div>
+                    <div className="font-medium text-gray-900 text-sm sm:text-base">{match.team1} vs {match.team2}</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-gray-600">{match.prediction}</span>
+                <div className="flex items-center space-x-2 mt-2 sm:mt-0">
+                  <span className="text-gray-600 text-sm sm:text-base">{match.prediction}</span>
                   <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
                 </div>
               </div>
@@ -234,7 +237,7 @@ useEffect(() => {
         <div className="text-center mt-8 relative">
           <button
             ref={bookingBtnRef}
-            className="bg-blue-600 text-white px-8 py-3 uppercase font-semibold hover:bg-blue-700 transition-colors"
+            className="bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 uppercase font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base"
             onClick={() => setIsBookingPopoverOpen((open) => !open)}
           >
             GET BOOKING CODE
@@ -245,55 +248,55 @@ useEffect(() => {
               style={{ top: '100%' }}
             >
               <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
-{games.length > 0 && (
-  <div className="flex flex-col gap-2 py-2">
-    <div className="flex justify-between items-center gap-2">
-      <span className="text-gray-700 font-medium">BetWay:</span>
-      <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.betWay_code}</span>
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(games[0].booking_code.betWay_code);
-          setCopiedCode('betway');
-          setTimeout(() => setCopiedCode(null), 1200);
-        }}
-        className="ml-2 p-1 rounded hover:bg-blue-100"
-        title="Copy BetWay code"
-      >
-        {copiedCode === 'betway' ? (
-          <span className="text-green-600 text-xs font-semibold">Copied!</span>
-        ) : (
-          <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
-          </svg>
-        )}
-      </button>
-    </div>
+              {games.length > 0 && (
+                <div className="flex flex-col gap-2 py-2">
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-gray-700 font-medium">BetWay:</span>
+                    <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.betWay_code}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(games[0].booking_code.betWay_code);
+                        setCopiedCode('betway');
+                        setTimeout(() => setCopiedCode(null), 1200);
+                      }}
+                      className="ml-2 p-1 rounded hover:bg-blue-100"
+                      title="Copy BetWay code"
+                    >
+                      {copiedCode === 'betway' ? (
+                        <span className="text-green-600 text-xs font-semibold">Copied!</span>
+                      ) : (
+                        <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
 
-    <div className="flex justify-between items-center gap-2">
-      <span className="text-gray-700 font-medium">SportyBet:</span>
-      <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.sportyBet_code}</span>
-      <button
-        onClick={() => {
-          navigator.clipboard.writeText(games[0].booking_code.sportyBet_code);
-          setCopiedCode('sportybet');
-          setTimeout(() => setCopiedCode(null), 1200);
-        }}
-        className="ml-2 p-1 rounded hover:bg-blue-100"
-        title="Copy SportyBet code"
-      >
-        {copiedCode === 'sportybet' ? (
-          <span className="text-green-600 text-xs font-semibold">Copied!</span>
-        ) : (
-          <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
-          </svg>
-        )}
-      </button>
-    </div>
-  </div>
-)}
+                  <div className="flex justify-between items-center gap-2">
+                    <span className="text-gray-700 font-medium">SportyBet:</span>
+                    <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.sportyBet_code}</span>
+                    <button
+                      onClick={() => {
+                        navigator.clipboard.writeText(games[0].booking_code.sportyBet_code);
+                        setCopiedCode('sportybet');
+                        setTimeout(() => setCopiedCode(null), 1200);
+                      }}
+                      className="ml-2 p-1 rounded hover:bg-blue-100"
+                      title="Copy SportyBet code"
+                    >
+                      {copiedCode === 'sportybet' ? (
+                        <span className="text-green-600 text-xs font-semibold">Copied!</span>
+                      ) : (
+                        <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                          <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
 
 
             </div>
@@ -302,7 +305,7 @@ useEffect(() => {
 
         {/* VIP Section */}
         <div className="mt-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
           <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4 text-blue-900 text-center">DAILY VIP PLAN</h3>
@@ -358,8 +361,8 @@ useEffect(() => {
 
         {/* VVIP Plans Section (added below VIP) */}
         <div className="mt-20">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full lg:max-w-6xl mx-auto">
             {/* DAILY VVIP PLAN */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
