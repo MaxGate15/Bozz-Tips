@@ -29,14 +29,14 @@ export default function Home() {
           Bozz Tips is a trusted football prediction platform dedicated to providing accurate, data-driven betting tips. Our team of experienced analysts delivers daily free and premium (VVIP) tips across various markets including Full-Time, HT/FT, Over/Under, and Correct Score. With a strong focus on transparency, consistency, and community, we help bettors make smarter decisions and improve their chances of winning. Join us and take your betting strategy to the next level.
         </motion.p>
 
-        <motion.a
+        {/* <motion.a
           href="/projects"
           className="inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:bg-blue-700 hover:scale-105 transition-all duration-200"
           whileHover={{ scale: 1.07 }}
           whileTap={{ scale: 0.97 }}
         >
           View Projects
-        </motion.a>
+        </motion.a> */}
       </motion.div>
     </main>
   );
