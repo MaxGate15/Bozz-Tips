@@ -48,7 +48,7 @@ export default function Footer() {
           </div>
 
           {/* Predictions Section */}
-          <div>
+          {/* <div>
             <h3 className="text-xl font-bold mb-4">PREDICTIONS</h3>
             <ul className="space-y-2 list-disc list-inside">
               <li className="text-red-500"><Link href="/predictions/football" className="text-gray-300 hover:text-red-500 ml-2">FOOTBALL</Link></li>
@@ -56,7 +56,7 @@ export default function Footer() {
               <li className="text-red-500"><Link href="/predictions/overunder" className="text-gray-300 hover:text-red-500 ml-2">OVER/UNDER</Link></li>
               <li className="text-red-500"><Link href="/predictions/correctscore" className="text-gray-300 hover:text-red-500 ml-2">CORRECT SCORE</Link></li>
             </ul>
-          </div>
+          </div> */}
 
           {/* Social Media Links */}
           <div>
@@ -93,9 +93,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400">©2025 Bozz Tips</p>
-          <Link href="/terms" className="text-red-500 hover:text-red-400">
-            Terms and conditions
-          </Link>
+          
         </div>
       </div>
     </footer>

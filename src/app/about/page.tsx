@@ -4,33 +4,40 @@ import { motion } from 'framer-motion'
 
 export default function Home() {
   return (
-    <main className="min-h-screen px-6 flex flex-col justify-center items-start space-y-8 bg-[#FFF8F0] text-black">
-      <motion.h1
-        className="text-5xl font-bold leading-tight"
+    <main className="min-h-screen px-6 flex flex-col justify-center items-center space-y-10 bg-gradient-to-br from-blue-600 via-blue-400 to-blue-200">
+      <motion.div
+        className="bg-white rounded-3xl shadow-xl px-10 py-12 flex flex-col items-center space-y-8 max-w-2xl"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        Bozz Tips
-      </motion.h1>
+        <motion.h1
+          className="text-5xl font-extrabold leading-tight text-black mb-2"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          About Us
+        </motion.h1>
 
-      <motion.p
-        className="text-lg max-w-xl text-gray-800"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.8 }}
-      >
-        Smart insights. Sharp strategies. Welcome to your next favorite portfolio.
-      </motion.p>
+        <motion.p
+          className="text-lg text-blue-900 font-medium text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.8 }}
+        >
+          Bozz Tips is a trusted football prediction platform dedicated to providing accurate, data-driven betting tips. Our team of experienced analysts delivers daily free and premium (VVIP) tips across various markets including Full-Time, HT/FT, Over/Under, and Correct Score. With a strong focus on transparency, consistency, and community, we help bettors make smarter decisions and improve their chances of winning. Join us and take your betting strategy to the next level.
+        </motion.p>
 
-      <motion.a
-        href="/projects"
-        className="inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-full hover:bg-orange-600 transition"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        View Projects
-      </motion.a>
+        <motion.a
+          href="/projects"
+          className="inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-full shadow-lg hover:bg-blue-700 hover:scale-105 transition-all duration-200"
+          whileHover={{ scale: 1.07 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          View Projects
+        </motion.a>
+      </motion.div>
     </main>
   );
 }
