@@ -211,7 +211,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
                         <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1 sm:mb-2">Win Rate</h3>
-                        <p className="text-2xl sm:text-3xl font-bold text-red-600">89%</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-red-600">96%</p>
                         <p className="text-gray-600 mt-1 sm:mt-2 text-xs sm:text-base">Based on your picks</p>
                     </div>
                 </div>
