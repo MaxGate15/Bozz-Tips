@@ -43,6 +43,7 @@ export default function RegisterPage() {
           email: '',
           password: '',
         });
+        alert('Signup successful! You can now log in.');
         
         router.push('/login');
       } else {
