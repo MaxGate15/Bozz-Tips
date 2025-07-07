@@ -13,9 +13,9 @@ const useGames = () => {
         const fetchData = async () => {
             try {
                 const [todayRes, tomorrowRes, yesterdayRes] = await Promise.all([
-                    axios.get("https://admin.bozz-tips.me/today-games"),
-                    axios.get("https://admin.bozz-tips.me/tomorrow-games"),
-                    axios.get("https://admin.bozz-tips.me/yesterday-games"),
+                    axios.get("https://admin.bozz-tips.com/today-games"),
+                    axios.get("https://admin.bozz-tips.com/tomorrow-games"),
+                    axios.get("https://admin.bozz-tips.com/yesterday-games"),
                 ]);
 
                 // Flatten games from slips

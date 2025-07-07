@@ -13,8 +13,8 @@ const useUpdateCheck = () => {
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const [updates,userPurchase] = await Promise.all([axios.get("https://admin.bozz-tips.me/check-today/",            ),
-            axios.get("https://admin.bozz-tips.me/check-user-purchases/",{
+            const [updates,userPurchase] = await Promise.all([axios.get("https://admin.bozz-tips.com/check-today/",            ),
+            axios.get("https://admin.bozz-tips.com/check-user-purchases/",{
             headers: { "X-Username": username },})]);
     
             

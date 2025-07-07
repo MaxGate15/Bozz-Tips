@@ -26,7 +26,7 @@ export default function RegisterPage() {
     e.preventDefault();
     // TODO: Implement registration logic
     try {
-      const response = await fetch('https://admin.bozz-tips.me/api/signup/', {
+      const response = await fetch('https://admin.bozz-tips.com/api/signup/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

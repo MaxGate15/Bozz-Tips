@@ -15,7 +15,7 @@ const useCurrentVipGames = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get("https://admin.bozz-tips.me/current-purchased-games/", {
+        const res = await axios.get("https://admin.bozz-tips.com/current-purchased-games/", {
           headers: { 'X-Username': username },
         });
 

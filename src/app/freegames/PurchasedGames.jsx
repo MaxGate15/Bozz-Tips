@@ -12,7 +12,7 @@ const usePurchasedGames = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get('https://admin.bozz-tips.me/purchased-games/', {
+                const res = await axios.get('https://admin.bozz-tips.com/purchased-games/', {
                     headers: { 'X-Username': username },
                 });
 

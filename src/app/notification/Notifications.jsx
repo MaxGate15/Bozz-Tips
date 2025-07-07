@@ -10,7 +10,7 @@ const useNotifications = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const res = await axios.get('https://admin.bozz-tips.me/notifications/');
+                const res = await axios.get('https://admin.bozz-tips.com/notifications/');
                 // Only set notifications where seen is false
                 setNotifications(res.data.filter(n => n.seen === false));
             } catch (err) {
