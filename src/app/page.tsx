@@ -18,6 +18,7 @@ type Game = {
   team1: string;
   team2: string;
   prediction: string;
+  result: string; // Added result field
 };
 
 const Home: React.FC = () => {
@@ -195,7 +196,15 @@ const Home: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="text-gray-600">{match.prediction}</span>
-                    <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
+                    <div
+                    className={`w-4 h-4 rounded-full ${
+                      match.result === 'won'
+                      ? 'bg-green-500'
+                      : match.result === 'lost'
+                      ? 'bg-red-500'
+                      : 'bg-yellow-300'
+                    }`}
+                    ></div>
                   </div>
                 </div>
               ))
