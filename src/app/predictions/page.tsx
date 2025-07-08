@@ -20,6 +20,7 @@ const PredictionsPage:React.FC = () => {
     team2: string;
     prediction: string;
     odd: string;
+    result: string;
     booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
 }
 type Update = {
@@ -226,7 +227,15 @@ useEffect(() => {
                 </div>
                 <div className="flex items-center space-x-2 mt-2 sm:mt-0">
                   <span className="text-gray-600 text-sm sm:text-base">{match.prediction}</span>
-                  <div className="w-4 h-4 rounded-full bg-yellow-300"></div>
+                    <div
+                    className={`w-4 h-4 rounded-full ${
+                      match.result === 'won'
+                      ? 'bg-green-500'
+                      : match.result === 'lost'
+                      ? 'bg-red-500'
+                      : 'bg-yellow-300'
+                    }`}
+                    ></div>
                 </div>
               </div>
             ))

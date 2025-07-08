@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { getUsername } from '../app/utils/auth';
+import router from 'next/router';
 import { u } from 'framer-motion/client';
 
 const countries = [
@@ -103,6 +104,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         ...(isNotGhana && { payment_channels: ['card'] }), // Only allow card if not in Ghana
         callback: function (response: any) {
           alert('Payment successful! Reference: ' + response.reference);
+          router.push('/vvip/games')
           onClose();
         },
         onClose: function () {
