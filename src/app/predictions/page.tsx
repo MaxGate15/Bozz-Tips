@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import React,{ useState,useEffect, useRef } from 'react';
 import LocationModal from '../../components/LocationModal';
+import usePreviousVipGames from '../freegames/PreviousVipGames';
 import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
 import useUpdateCheck from '../UpdateCheck/Check';
@@ -38,6 +39,7 @@ type Update = {
 // const [selectedDate, setSelectedDate] = useState(new Date());
 // const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 const [games, setGames] = useState<Game[]>([])
+const [yesterdayGames, setYesterdayGames] = useState<Game[]>([]);
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
 const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
 const buyPlanBtnRef = React.useRef<HTMLButtonElement>(null);
@@ -61,10 +63,46 @@ const bookingBtnRef = useRef<HTMLButtonElement>(null);
 //   { site: 'SportyBet', code: 'AD3S4S' },
 //   { site: 'Betway', code: '123647' },
 // ];
+type games = {
+  game_id: number;
+  team1: string;
+  team2: string;
+  prediction: string;
+  
+  result: 'won' | 'lost' | 'pending';
+}
+type Slip = {
+  slip_id: number;
+  games: games[];
+results: string,
+total_odd:string,
+price:string,
+category:string,
+date_created:string,
+}
 const [copiedCode, setCopiedCode] = useState<string | null>(null);
 const [selectedDate, setSelectedDate] = useState<string>("");
 const [showDatePicker, setShowDatePicker] = useState(false);
 const [calendarDate, setCalendarDate] = useState<Date | null>(null);
+
+const dateNow = {
+  today: new Date().toLocaleDateString('en-US')
+    .split('/')
+    .reverse()
+    .join('-'),
+  yesterday: new Date(Date.now() - 864e5)
+    .toLocaleDateString('en-US')
+    .split('/')
+    .reverse()
+    .join('-'),}
+
+const {vipPSlips, vvip1PSlips, vvip2PSlips, vvip3PSlips} = usePreviousVipGames() as {
+    vipPSlips: Slip[];
+    vvip1PSlips: Slip[];
+    vvip2PSlips: Slip[];
+    vvip3PSlips: Slip[];
+  };
+
 
 useEffect(() => {
   if (selectedDay === 'today') {
@@ -136,6 +174,12 @@ type VVIP = {
 
     []
   )
+  const statusColor = {
+  won: 'bg-green-500',
+  lost: 'bg-red-500',
+  pending: 'bg-yellow-400',
+  default: 'bg-yellow-400',
+};
 
    useEffect(() => {
     const fetchUpdates = async () => {
@@ -340,6 +384,7 @@ type VVIP = {
         </div>
 
         {/* VIP Section */}
+        {  !updateAvailable?.vip && !updatePurchase?.vip &&
         <div className="mt-20">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
           <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
@@ -394,13 +439,15 @@ type VVIP = {
               />
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* VVIP Plans Section (added below VIP) */}
+        
         <div className="mt-20">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full lg:max-w-6xl mx-auto">
             {/* DAILY VVIP PLAN */}
+            { !updateAvailable?.vvip1 && !updatePurchase?.vvip1 &&
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
@@ -441,8 +488,9 @@ type VVIP = {
                   price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00} // Assuming the price is fixed for VVIP1
                 />
               </div>
-                </div>
+                </div>}
             {/* DAILY VVIP PLAN 2 */}
+            { !updateAvailable?.vvip2 && !updatePurchase?.vvip2 &&
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
@@ -495,8 +543,9 @@ type VVIP = {
                   price={vvipData.find(i => i.category === "vvip2")?.price ?? 20.00} // Assuming the price is fixed for VVIP2
                 />
               </div>
-            </div>
+            </div>}
             {/* DAILY VVIP PLAN 3 */}
+            { !updateAvailable?.vvip3 && !updatePurchase?.vvip3 &&
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
@@ -555,11 +604,96 @@ type VVIP = {
                   price={vvipData.find(i => i.category === "vvip3")?.price ?? 30.00} // Assuming the price is fixed for VVIP3
           />
         </div>
-      </div>
+      </div>}
           </div>
         </div>
 
-        {/* Correct Score Section */}
+        {/* Yesterday's vvip games Section */}
+        <section>
+          <h2 className="text-2xl font-semibold mb-4 text-orange-500 uppercase tracking-wide">Previous Paid Games</h2>
+          {vipPSlips.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VIP games were purchased yesterday.</div>
+          ) : (
+            vipPSlips.map((game) => (
+              <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-lg text-blue-900">Yesterday's VIP Games</span>
+                  <span className="text-sm text-gray-500">{dateNow.yesterday}</span>
+                </div>
+                <ul className="list-none pl-0 text-base text-gray-800">
+                  {game.games.map((tip, idx) => (
+                    <li key={idx} className="flex items-center gap-2 mb-1">
+                      <span className={`inline-block w-3 h-3 rounded-full ${statusColor[tip.result as keyof typeof statusColor]}`}></span>
+                      {tip.team1} vs {tip.team2} - {tip.prediction}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+          {vvip1PSlips.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP1 games were purchased yesterday.</div>
+          ) : (
+            vvip1PSlips.map((game) => (
+              <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-lg text-blue-900">Yesterday's VVIP1 Games</span>
+                  <span className="text-sm text-gray-500">{dateNow.yesterday}</span>
+                </div>
+                <ul className="list-none pl-0 text-base text-gray-800">
+                  {game.games.map((tip, idx) => (
+                    <li key={idx} className="flex items-center gap-2 mb-1">
+                      <span className={`inline-block w-3 h-3 rounded-full ${statusColor[tip.result as keyof typeof statusColor]}`}></span>
+                      {tip.team1} vs {tip.team2} - {tip.prediction}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+          {vvip2PSlips.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP2 games were purchased yesterday.</div>
+          ) : (
+            vvip2PSlips.map((game) => (
+              <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-lg text-blue-900">Yesterday's VVIP2 Games</span>
+                  <span className="text-sm text-gray-500">{dateNow.yesterday}</span>
+                </div>
+                <ul className="list-none pl-0 text-base text-gray-800">
+                  {game.games.map((tip, idx) => (
+                    <li key={idx} className="flex items-center gap-2 mb-1">
+                      <span className={`inline-block w-3 h-3 rounded-full ${statusColor[tip.result as keyof typeof statusColor]}`}></span>
+                      {tip.team1} vs {tip.team2} - {tip.prediction}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+          {vvip3PSlips.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP3 games were purchased yesterday.</div>
+          ) : (
+            vvip3PSlips.map((game) => (
+              <div key={game.slip_id} className="bg-white rounded-lg shadow p-6 mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="font-bold text-lg text-blue-900">Yesterday's VVIP3 Games</span>
+                  <span className="text-sm text-gray-500">{dateNow.yesterday}</span>
+                </div>
+                <ul className="list-none pl-0 text-base text-gray-800">
+                  {game.games.map((tip, idx) => (
+                    <li key={idx} className="flex items-center gap-2 mb-1">
+                      <span className={`inline-block w-3 h-3 rounded-full ${statusColor[tip.result as keyof typeof statusColor]}`}></span>
+                      {tip.team1} vs {tip.team2} - {tip.prediction}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))
+          )}
+
+        </section>
+
         {/* Removed as requested */}
       </div>
     </div>
