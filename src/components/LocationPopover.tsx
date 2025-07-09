@@ -14,17 +14,24 @@ interface LocationPopoverProps {
   onClose: () => void;
   anchorRef: React.RefObject<HTMLButtonElement>;
   game_category: string;
+  price: number;
 }
 
 async function getRate(currencyCode: string): Promise<number> {
-  const res = await fetch(`https://v6.exchangerate-api.com/v6/37df04ffeafcf2a0e93ef8a3/latest/USD`);
-  const data = await res.json();
-  const rate = data.conversion_rates[currencyCode];
-  const amountInLocal = rate * 5;
-  return Math.floor(amountInLocal * 100);
+  if (currencyCode === 'GHS') return 1;
+
+  const response = await fetch(`https://api.exchangerate.host/latest?base=${currencyCode}&symbols=GHS`);
+  const data = await response.json();
+
+  if (!data || !data.rates || !data.rates.GHS) {
+    throw new Error('Failed to fetch exchange rate');
+  }
+
+  return data.rates.GHS;
 }
 
-const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anchorRef,game_category }) => {
+
+const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anchorRef,game_category,price }) => {
   const [step, setStep] = useState<'location' | 'country'>('location');
   const [selectedLocation, setSelectedLocation] = useState<'ghana' | 'not-ghana' | null>(null);
   const [selectedCountry, setSelectedCountry] = useState<string>('');
@@ -83,12 +90,15 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       return;
     }
     try {
-      const rate = await getRate(currencyCode);
+     const rate = await getRate('USD'); // e.g., 1 USD = 15.25 GHS
+
+
       const isNotGhana = selectedLocation === 'not-ghana';
       const handler = (window as any).PaystackPop.setup({
         key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
-        email: 'Kofiokolobaah@gmail.com',
-        amount: 1,
+        username: username,
+        
+        amount: price*rate,
         currency: currencyCode,
         ref: '' + Math.floor(Math.random() * 1000000000 + 1),
         metadata: {
@@ -103,8 +113,9 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         },
         ...(isNotGhana && { payment_channels: ['card'] }), // Only allow card if not in Ghana
         callback: function (response: any) {
-          alert('Payment successful! Reference: ' + response.reference);
           router.push('/vvip/games')
+          alert('Payment successful! Reference: ' + response.reference);
+          
           onClose();
         },
         onClose: function () {

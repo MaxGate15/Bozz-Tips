@@ -18,8 +18,7 @@ const usePreviousVipGames = () => {
     useEffect(() => {
         const fetchData = async () => {
         try {
-            const res = await axios.get("https://admin.bozz-tips.com/previous-purchased-games/", {
-            headers: { "X-Username": username },
+            const res = await axios.get("https://admin.bozz-tips.com/vvip-yesterday/", {
             });
     
             const slips = res.data;

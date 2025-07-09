@@ -5,6 +5,7 @@ import LocationPopover from '../../components/LocationPopover';
 import Link from 'next/link';
 import useUpdateCheck from '../UpdateCheck/Check'
 import { useRouter } from 'next/navigation';
+import axios from 'axios';
 import { isAuthenticated } from '../utils/auth'; // adjust path as needed
 
 
@@ -14,12 +15,24 @@ export default function VVIPPage() {
   const dailyBtnRef = useRef<HTMLButtonElement>(null);
   const weeklyBtnRef = useRef<HTMLButtonElement>(null);
   const monthlyBtnRef = useRef<HTMLButtonElement>(null);
+   type VVIP = {
+    price: number;
+    category: string;
+  }
+  const [vvipData,setVvipData]=useState<VVIP[]>(
+
+    []
+  )
+
+ 
+
   type Updates = {
     vip: boolean;
     vvip1: boolean;
     vvip2: boolean;
     vvip3: boolean;
   }
+  
   
   const {
     updateAvailable,
@@ -34,6 +47,23 @@ export default function VVIPPage() {
   };
 
   const router = useRouter();
+  useEffect(() => {
+    const fetchUpdates = async () => {
+      try {
+        const response = await axios.get('https://admin.bozz-tips.com/vvip-price/'); // Adjust the API endpoint as needed
+        if (response.data) {
+          // Assuming the response data structure matches the expected type
+          setVvipData(response.data);
+          
+        }
+      }
+      catch (error) {
+        console.error('Error fetching updates:', error);
+      }
+    }
+    fetchUpdates();
+  }, []);
+    
 
   useEffect(() => {
     if (typeof window !== 'undefined' && !isAuthenticated()) {
@@ -64,11 +94,13 @@ export default function VVIPPage() {
 
         {/* Packages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Daily Package */}
+          {/* Daily Package */}{ !updateAvailable?.[0]?.vip && !updatePurchase?.[0]?.vip &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
-              <div className="text-red-600 text-3xl font-bold mb-6">$4.00</div>
+              <div className="text-red-600 text-3xl font-bold mb-6">
+                ${vvipData.find(i => i.category === "vvip1")?.price ?? '10.00'}
+              </div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,15 +134,17 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={dailyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip1'
+                price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00}
               />
             </div>
-          </div>
+          </div>}
 
           {/* Daily VVIP Plan 2 */}
+          { !updateAvailable?.[0]?.vvip2 && !updatePurchase?.[0]?.vvip2 &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-6">
+`            <div className="p-6">`
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
-              <div className="text-red-600 text-3xl font-bold mb-6">$20.00</div>
+              <div className="text-red-600 text-3xl font-bold mb-6">${vvipData.find(i => i.category === "vvip2")?.price ?? '20.00'}</div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -156,15 +190,16 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={weeklyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip2'
+                price={vvipData.find(i => i.category === "vvip2")?.price ?? 20.00}
               />
             </div>
-          </div>
+          </div>}
 
-          {/* Daily VVIP Plan 3 */}
+          {/* Daily VVIP Plan 3 */}{ !updateAvailable?.[0]?.vvip3 && !updatePurchase?.[0]?.vvip3 &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
-              <div className="text-red-600 text-3xl font-bold mb-6">$33.33</div>
+              <div className="text-red-600 text-3xl font-bold mb-6">${vvipData.find(i => i.category === "vvip3")?.price ?? '33.33'}</div>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -216,9 +251,10 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={monthlyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip3'
+                price={vvipData.find(i => i.category === "vvip3")?.price ?? 33.33}
               />
             </div>
-          </div>
+          </div>}
         </div>
       </div>
     </div>

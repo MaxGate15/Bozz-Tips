@@ -77,6 +77,10 @@ const statusColor = {
   default: 'bg-yellow-400',
 };
 
+type booking = {
+  sportyBet_code: string;
+  betWay_code: string;}
+
 type games = {
   game_id: number;
   team1: string;
@@ -93,7 +97,7 @@ total_odd:string,
 price:string,
 category:string,
 date_created:string,
-
+booking_code: booking;
 }
 
 
@@ -202,9 +206,46 @@ export default function VVIPGamesPage() {
                     </li>
                   ))}
                 </ul>
+                  <div className="mt-4 text-sm text-gray-600">
+                    {/* Display booking codes with a copy field */}
+                    <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-blue-700">SportyBet Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.sportyBet_code || 'N/A'}</span>
+                        {game.booking_code.sportyBet_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.sportyBet_code);
+                            }}
+                            title="Copy SportyBet Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-green-700">BetWay Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
+                        {game.booking_code.betWay_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                            }}
+                            title="Copy BetWay Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
+  
+                  </div>
               </div>
             ))
           )}
+          
           {vvip1Slips.length === 0  ? (
             <div >
               <div className="bg-white rounded-lg shadow p-6 text-center text-gray-500">No VVIP1 game has been purchased yet.</div>
@@ -240,6 +281,39 @@ export default function VVIPGamesPage() {
                     </li>
                   ))}
                 </ul>
+                <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-blue-700">SportyBet Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.sportyBet_code || 'N/A'}</span>
+                        {game.booking_code.sportyBet_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.sportyBet_code);
+                            }}
+                            title="Copy SportyBet Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-green-700">BetWay Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
+                        {game.booking_code.betWay_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                            }}
+                            title="Copy BetWay Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                
               </div>
             ))
           )}
@@ -278,6 +352,38 @@ export default function VVIPGamesPage() {
                     </li>
                   ))}
                 </ul>
+                <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-blue-700">SportyBet Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.sportyBet_code || 'N/A'}</span>
+                        {game.booking_code.sportyBet_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.sportyBet_code);
+                            }}
+                            title="Copy SportyBet Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-green-700">BetWay Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
+                        {game.booking_code.betWay_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                            }}
+                            title="Copy BetWay Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
               </div>
             ))
           )}
@@ -316,6 +422,38 @@ export default function VVIPGamesPage() {
                     </li>
                   ))}
                 </ul>
+                <div className="flex flex-col gap-2 mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-blue-700">SportyBet Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.sportyBet_code || 'N/A'}</span>
+                        {game.booking_code.sportyBet_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.sportyBet_code);
+                            }}
+                            title="Copy SportyBet Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-green-700">BetWay Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
+                        {game.booking_code.betWay_code && (
+                          <button
+                            className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
+                            onClick={() => {
+                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                            }}
+                            title="Copy BetWay Code"
+                          >
+                            Copy
+                          </button>
+                        )}
+                      </div>
+                    </div>
               </div>
             ))
           )}
