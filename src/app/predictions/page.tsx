@@ -6,6 +6,7 @@ import LocationPopover from '../../components/LocationPopover';
 import useGames from '../freegames/FreeGames';
 import useUpdateCheck from '../UpdateCheck/Check';
 import DatePicker from 'react-datepicker';
+import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 
@@ -127,6 +128,32 @@ useEffect(() => {
 //   const month = String(date.getMonth() + 1).padStart(2, '0');
 //   const day = String(date.getDate()).padStart(2, '0');
 //   return `${year}-${month}-${day}`;
+type VVIP = {
+    price: number;
+    category: string;
+  }
+  const [vvipData,setVvipData]=useState<VVIP[]>(
+
+    []
+  )
+
+   useEffect(() => {
+    const fetchUpdates = async () => {
+      try {
+        const response = await axios.get('https://admin.bozz-tips.com/vvip-price/'); // Adjust the API endpoint as needed
+        if (response.data) {
+          // Assuming the response data structure matches the expected type
+          setVvipData(response.data);
+          
+        }
+      }
+      catch (error) {
+        console.error('Error fetching updates:', error);
+      }
+    }
+    fetchUpdates();
+  }, []);
+    
 // };
 
   return (
@@ -323,7 +350,7 @@ useEffect(() => {
                   Available
                 </span>
               </div>
-              <div className="text-blue-600 text-3xl font-bold mb-6 text-center">$2.67</div>
+              <div className="text-blue-600 text-3xl font-bold mb-6 text-center">${vvipData.find(i => i.category === "vvip1")?.price ?? '10.00'}</div>
               <ul className="space-y-3">
                 <li className="flex items-center">
                   <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,6 +390,7 @@ useEffect(() => {
                 onClose={() => setIsLocationPopoverOpen(false)}
                 anchorRef={buyPlanBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vip'
+                price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00} // Assuming the price is fixed for VIP
               />
             </div>
           </div>
@@ -376,7 +404,7 @@ useEffect(() => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
-                <div className="text-red-600 text-3xl font-bold mb-6">$4.00</div>
+                <div className="text-red-600 text-3xl font-bold mb-6">${vvipData.find(i => i.category === "vvip1")?.price ?? '10.00'}</div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,6 +438,7 @@ useEffect(() => {
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip1'
+                  price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00} // Assuming the price is fixed for VVIP1
                 />
               </div>
                 </div>
@@ -417,7 +446,7 @@ useEffect(() => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
-                <div className="text-red-600 text-3xl font-bold mb-6">$20.00</div>
+                <div className="text-red-600 text-3xl font-bold mb-6">${vvipData.find(i => i.category === "vvip2")?.price ?? '10.00'}</div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -463,6 +492,7 @@ useEffect(() => {
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip2'
+                  price={vvipData.find(i => i.category === "vvip2")?.price ?? 20.00} // Assuming the price is fixed for VVIP2
                 />
               </div>
             </div>
@@ -470,7 +500,7 @@ useEffect(() => {
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
-                <div className="text-red-600 text-3xl font-bold mb-6">$33.33</div>
+                <div className="text-red-600 text-3xl font-bold mb-6">${vvipData.find(i => i.category === "vvip3")?.price ?? '10.00'}</div>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -522,6 +552,7 @@ useEffect(() => {
             onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip3'
+                  price={vvipData.find(i => i.category === "vvip3")?.price ?? 30.00} // Assuming the price is fixed for VVIP3
           />
         </div>
       </div>
