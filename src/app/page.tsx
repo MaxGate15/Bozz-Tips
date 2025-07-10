@@ -33,10 +33,10 @@ const Home: React.FC = () => {
 
   const { today, tomorrow, yesterday, loading, error } = useGames();
   const { data: session } = useSession();
-  useEffect(() => {
-    const username = getUsername();
-    alert(`Welcome to Bozz Tips${username ? ', ' + username : ''}!`);
-  }, []);
+  
+  const username = getUsername();
+  alert(`Welcome to Bozz Tips${username ? ', ' + username : ''}!`);
+  
 
   useEffect(() => {
     if (selectedDay === 'today') {
