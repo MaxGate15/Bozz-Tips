@@ -445,14 +445,15 @@ type VVIP = {
         
         <div className="mt-20">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full lg:max-w-6xl mx-auto">
-            {!updateAvailable?.vvip1 && !updateAvailable?.vvip2 && !updateAvailable?.vvip3 && !updateAvailable?.vip &&(
+          {!updateAvailable?.vvip1 && !updateAvailable?.vvip2 && !updateAvailable?.vvip3 && !updateAvailable?.vip &&(
               <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-lg shadow-md overflow-hidden">
                 <div className="p-6">
                   <h3 className="text-xl font-bold mb-4 text-red-600">No VVIP Plans Available</h3>
                   <p className="text-gray-600">Currently, there are no VVIP plans available. Please check back later.</p>
                 </div>
                 </div>)}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full lg:max-w-6xl mx-auto">
+            
             {/* DAILY VVIP PLAN */}
             { updateAvailable?.vvip1 && 
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
