@@ -53,6 +53,8 @@ export default function Navbar() {
     if ((status === 'authenticated' && session) || isAuthenticated() || getToken()) {
       setAuth(true);
       setUsername(getUsername() || session?.user?.name || 'User');
+    const username = getUsername();
+      alert(`Welcome to Bozz Tips${username ? ', ' + username : ''}!`);
     } else {
       setAuth(false);
       setUsername('');

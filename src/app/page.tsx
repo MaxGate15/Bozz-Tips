@@ -34,8 +34,7 @@ const Home: React.FC = () => {
   const { today, tomorrow, yesterday, loading, error } = useGames();
   const { data: session } = useSession();
   
-  const username = getUsername();
-  alert(`Welcome to Bozz Tips${username ? ', ' + username : ''}!`);
+  
   
 
   useEffect(() => {
