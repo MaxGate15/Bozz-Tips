@@ -384,7 +384,7 @@ type VVIP = {
         </div>
 
         {/* VIP Section */}
-        {  !updateAvailable?.vip && !updatePurchase?.vip &&
+        {  updateAvailable?.vip  &&
         <div className="mt-20">
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VIP</h2>
           <div className="max-w-sm mx-auto bg-white rounded-lg shadow-md overflow-hidden">
