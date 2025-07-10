@@ -447,7 +447,7 @@ type VVIP = {
           <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-blue-900">VVIP PLANS</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-full lg:max-w-6xl mx-auto">
             {/* DAILY VVIP PLAN */}
-            { !updateAvailable?.vvip1 && !updatePurchase?.vvip1 &&
+            { updateAvailable?.vvip1 && 
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
@@ -490,7 +490,7 @@ type VVIP = {
               </div>
                 </div>}
             {/* DAILY VVIP PLAN 2 */}
-            { !updateAvailable?.vvip2 && !updatePurchase?.vvip2 &&
+            { updateAvailable?.vvip2 && 
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
@@ -545,7 +545,7 @@ type VVIP = {
               </div>
             </div>}
             {/* DAILY VVIP PLAN 3 */}
-            { !updateAvailable?.vvip3 && !updatePurchase?.vvip3 &&
+            { updateAvailable?.vvip3 &&
             <div className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
