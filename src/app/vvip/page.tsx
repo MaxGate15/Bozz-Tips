@@ -16,7 +16,7 @@ export default function VVIPPage() {
   const weeklyBtnRef = useRef<HTMLButtonElement>(null);
   const monthlyBtnRef = useRef<HTMLButtonElement>(null);
    type VVIP = {
-    price: number;
+    price: string;
     category: string;
   }
   const [vvipData,setVvipData]=useState<VVIP[]>(
@@ -128,7 +128,7 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={dailyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip1'
-                price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00}
+                price={vvipData.find(i => i.category === "vvip1")?.price ?? "10.00"}
               />
             </div>
           </div>}
@@ -172,7 +172,7 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={weeklyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip2'
-                price={vvipData.find(i => i.category === "vvip2")?.price ?? 20.00}
+                price={vvipData.find(i => i.category === "vvip2")?.price ?? "20.00"}
               />
             </div>
           </div>}
@@ -221,7 +221,7 @@ export default function VVIPPage() {
                 onClose={() => setOpenPopover(null)}
                 anchorRef={monthlyBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vvip3'
-                price={vvipData.find(i => i.category === "vvip3")?.price ?? 33.33}
+                price={vvipData.find(i => i.category === "vvip3")?.price ?? "33.33"}
               />
             </div>
           </div>}

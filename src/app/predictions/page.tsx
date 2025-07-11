@@ -168,7 +168,7 @@ useEffect(() => {
 //   const day = String(date.getDate()).padStart(2, '0');
 //   return `${year}-${month}-${day}`;
 type VVIP = {
-    price: number;
+    price: string;
     category: string;
   }
   const [vvipData,setVvipData]=useState<VVIP[]>(
@@ -458,7 +458,7 @@ type VVIP = {
                 onClose={() => setIsLocationPopoverOpen(false)}
                 anchorRef={buyPlanBtnRef as React.RefObject<HTMLButtonElement>}
                 game_category='vip'
-                price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00} // Assuming the price is fixed for VIP
+                price={vvipData.find(i => i.category === "vvip1")?.price ?? "10.00"} // Assuming the price is fixed for VIP
               />
             </div>
           </div>
@@ -510,7 +510,7 @@ type VVIP = {
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[0] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip1'
-                  price={vvipData.find(i => i.category === "vvip1")?.price ?? 10.00} // Assuming the price is fixed for VVIP1
+                  price={vvipData.find(i => i.category === "vvip1")?.price ?? "10.00"} // Assuming the price is fixed for VVIP1
                 />
               </div>
                 </div>}
@@ -553,7 +553,7 @@ type VVIP = {
                   onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[1] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip2'
-                  price={vvipData.find(i => i.category === "vvip2")?.price ?? 20.00} // Assuming the price is fixed for VVIP2
+                  price={vvipData.find(i => i.category === "vvip2")?.price ?? "20.00"} // Assuming the price is fixed for VVIP2
                 />
               </div>
             </div>}
@@ -602,7 +602,7 @@ type VVIP = {
             onClose={() => setOpenVvipPopover(null)}
                   anchorRef={vvipBtnRefs[2] as React.RefObject<HTMLButtonElement>}
                   game_category='vvip3'
-                  price={vvipData.find(i => i.category === "vvip3")?.price ?? 30.00} // Assuming the price is fixed for VVIP3
+                  price={vvipData.find(i => i.category === "vvip3")?.price ?? "30.00"} // Assuming the price is fixed for VVIP3
           />
         </div>
       </div>}
