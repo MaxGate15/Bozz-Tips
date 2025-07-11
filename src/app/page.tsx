@@ -1,6 +1,6 @@
 'use client';
 import Link from "next/link";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { getUsername, getToken, isAuthenticated } from './utils/auth';
 import LocationModal from '../components/LocationModal';
 import useGames from "./freegames/FreeGames";
@@ -9,6 +9,8 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaRegCalendarAlt } from 'react-icons/fa';
 import AnimatedCounter from '../components/Animatedcounter';
+import { format } from 'date-fns';
+import { useRef, useState } from 'react';
 
 type Game = {
   game_id: number;
@@ -19,6 +21,10 @@ type Game = {
   team2: string;
   prediction: string;
   result: string; // Added result field
+  booking_code?: {
+    betWay_code: string;
+    sportyBet_code: string;
+  };
 };
 
 const Home: React.FC = () => {
@@ -30,6 +36,9 @@ const Home: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState<string>("");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [calendarDate, setCalendarDate] = useState<Date | null>(null);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
+  const bookingBtnRef = useRef<HTMLButtonElement>(null);
+  const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
 
   const { today, tomorrow, yesterday, loading, error } = useGames();
   const { data: session } = useSession();
@@ -92,7 +101,7 @@ const Home: React.FC = () => {
               JOIN VVIP
             </Link>
             <Link
-              href="https://t.me/wassce_bece_2024"
+              href="https://t.me/+4IYlVJxd_R1iM2U0"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white text-blue-900 px-3 py-2 sm:px-4 sm:py-3 rounded-full font-bold hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[140px] text-center text-sm sm:text-base"
@@ -178,37 +187,125 @@ const Home: React.FC = () => {
             ) : games.length === 0 ? (
               <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
             ) : (
-              games.map((match, index) => (
-                <div
-                  key={index}
-                  className="bg-white border-b border-gray-100 py-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
-                >
-                  <div className="flex items-center space-x-8">
-                    <div className="w-24 text-blue-600">
-                      <div className="font-semibold">{match.date_created}</div>
-                      <div className="text-sm">{match.time_created}</div>
+              games.map((match, index) => {
+                // Format date to MM/DD
+                let formattedDate = '';
+                try {
+                  formattedDate = format(new Date(match.date_created), 'MM/dd');
+                } catch {
+                  formattedDate = match.date_created;
+                }
+                // Format time to h:mm a (e.g., 3:26 pm)
+                let formattedTime = '';
+                try {
+                  const [hours, minutes, seconds] = match.time_created.split(':');
+                  const date = new Date();
+                  date.setHours(Number(hours));
+                  date.setMinutes(Number(minutes));
+                  date.setSeconds(Number(seconds));
+                  formattedTime = format(date, 'h:mm a').toLowerCase();
+                } catch {
+                  formattedTime = match.time_created;
+                }
+                return (
+                  <div
+                    key={index}
+                    className="bg-white border-b border-gray-100 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-1 sm:px-3 text-xs sm:text-sm"
+                    style={{ minHeight: '40px', maxWidth: '100%' }}
+                  >
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 w-full">
+                      <div className="w-full sm:w-20 text-blue-600 flex flex-row sm:flex-col justify-between sm:justify-start">
+                        <div className="font-semibold">{formattedDate}</div>
+                        <div className="text-xs">{formattedTime}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500 text-[10px] sm:text-xs mb-1">{match.game_type}</div>
+                        <div className="font-medium text-gray-900 text-xs sm:text-sm">{match.team1} vs {match.team2}</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="text-gray-500 text-sm mb-1">{match.game_type}</div>
-                      <div className="font-medium text-gray-900">{match.team1} vs {match.team2}</div>
+                    <div className="flex flex-col items-center min-w-[60px] mt-1 sm:mt-0">
+                      <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">{match.prediction}</span>
+                      <div
+                        className={`w-3 h-3 rounded-full mt-1 ${
+                          match.result === 'won'
+                            ? 'bg-green-500'
+                            : match.result === 'lost'
+                            ? 'bg-red-500'
+                            : 'bg-yellow-300'
+                        }`}
+                      ></div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <span className="text-gray-600">{match.prediction}</span>
-                    <div
-                    className={`w-4 h-4 rounded-full ${
-                      match.result === 'won'
-                      ? 'bg-green-500'
-                      : match.result === 'lost'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-300'
-                    }`}
-                    ></div>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
 
+            {/* Booking Code Section */}
+            <div className="text-center mt-8 relative">
+              <button
+                ref={bookingBtnRef}
+                className="bg-blue-600 text-white px-6 sm:px-8 py-2 sm:py-3 uppercase font-semibold hover:bg-blue-700 transition-colors text-sm sm:text-base"
+                onClick={() => setIsBookingPopoverOpen((open) => !open)}
+              >
+                GET BOOKING CODE
+              </button>
+              {isBookingPopoverOpen && (
+                <div
+                  className="absolute left-1/2 -translate-x-1/2 mt-2 w-64 bg-white border border-blue-200 rounded-lg shadow-lg z-50 p-4"
+                  style={{ top: '100%' }}
+                >
+                  <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
+                  {games.length > 0 && (
+                    <div className="flex flex-col gap-2 py-2">
+                      <div className="flex justify-between items-center gap-2">
+                        <span className="text-gray-700 font-medium">BetWay:</span>
+                        <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.betWay_code}</span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(games[0].booking_code?.betWay_code || '');
+                            setCopiedCode('betway');
+                            setTimeout(() => setCopiedCode(null), 1200);
+                          }}
+                          className="ml-2 p-1 rounded hover:bg-blue-100"
+                          title="Copy BetWay code"
+                        >
+                          {copiedCode === 'betway' ? (
+                            <span className="text-green-600 text-xs font-semibold">Copied!</span>
+                          ) : (
+                            <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                      <div className="flex justify-between items-center gap-2">
+                        <span className="text-gray-700 font-medium">SportyBet:</span>
+                        <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.sportyBet_code}</span>
+                        <button
+                          onClick={() => {
+                            navigator.clipboard.writeText(games[0].booking_code?.sportyBet_code || '');
+                            setCopiedCode('sportybet');
+                            setTimeout(() => setCopiedCode(null), 1200);
+                          }}
+                          className="ml-2 p-1 rounded hover:bg-blue-100"
+                          title="Copy SportyBet code"
+                        >
+                          {copiedCode === 'sportybet' ? (
+                            <span className="text-green-600 text-xs font-semibold">Copied!</span>
+                          ) : (
+                            <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                              <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
             {/* Unlock More Button */}
             <div className="text-center mt-12">
               <button

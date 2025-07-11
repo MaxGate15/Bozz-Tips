@@ -38,6 +38,24 @@ export default function Home() {
           View Projects
         </motion.a> */}
       </motion.div>
+
+      {/* Contact Us Section */}
+      <motion.div
+        className="mt-10 w-full flex flex-col items-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.8 }}
+      >
+        <h2 className="text-2xl font-bold mb-2">Contact Us</h2>
+        <a
+          href="https://t.me/bozztipsadmin"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-600 hover:underline text-lg"
+        >
+          Contact us on Telegram: @bozztipsadmin
+        </a>
+      </motion.div>
     </main>
   );
 }

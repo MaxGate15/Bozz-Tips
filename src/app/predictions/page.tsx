@@ -10,6 +10,7 @@ import DatePicker from 'react-datepicker';
 import axios from 'axios';
 import 'react-datepicker/dist/react-datepicker.css';
 import { FaRegCalendarAlt } from 'react-icons/fa';
+import { format } from 'date-fns';
 
 
 const PredictionsPage:React.FC = () => {
@@ -281,35 +282,57 @@ type VVIP = {
           ) : games.length === 0 ? (
             <p className="text-center text-red-500 font-semibold">No games available for {selectedDay}.</p>
           ) : (
-            games.map((match, index) => (
-              <div
-                key={index}
-                className="bg-white border-b border-gray-100 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-2 sm:px-6"
-              >
-                <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-8 w-full">
-                  <div className="w-full sm:w-24 text-blue-600 flex flex-row sm:flex-col justify-between sm:justify-start">
-                    <div className="font-semibold">{match.date_created}</div>
-                    <div className="text-sm">{match.time_created}</div>
+            games.map((match, index) => {
+              // Format date to MM/DD
+              let formattedDate = '';
+              try {
+                formattedDate = format(new Date(match.date_created), 'MM/dd');
+              } catch {
+                formattedDate = match.date_created;
+              }
+              // Format time to h:mma (e.g., 3:26pm)
+              let formattedTime = '';
+              try {
+                const [hours, minutes, seconds] = match.time_created.split(':');
+                const date = new Date();
+                date.setHours(Number(hours));
+                date.setMinutes(Number(minutes));
+                date.setSeconds(Number(seconds));
+                formattedTime = format(date, 'h:mma').toLowerCase();
+              } catch {
+                formattedTime = match.time_created;
+              }
+              return (
+                <div
+                  key={index}
+                  className="bg-white border-b border-gray-100 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-1 sm:px-3 text-xs sm:text-sm"
+                  style={{ minHeight: '40px', maxWidth: '100%' }}
+                >
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 w-full">
+                    <div className="w-full sm:w-20 text-blue-600 flex flex-row sm:flex-col justify-between sm:justify-start">
+                      <div className="font-semibold">{formattedDate}</div>
+                      <div className="text-xs">{formattedTime}</div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500 text-[10px] sm:text-xs mb-1">{match.game_type}</div>
+                      <div className="font-medium text-gray-900 text-xs sm:text-sm">{match.team1} vs {match.team2}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-gray-500 text-xs sm:text-sm mb-1">{match.game_type}</div>
-                    <div className="font-medium text-gray-900 text-sm sm:text-base">{match.team1} vs {match.team2}</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                  <span className="text-gray-600 text-sm sm:text-base">{match.prediction}</span>
+                  <div className="flex flex-col items-center mt-1 sm:mt-0 min-w-[60px]">
+                    <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">{match.prediction}</span>
                     <div
-                    className={`w-4 h-4 rounded-full ${
-                      match.result === 'won'
-                      ? 'bg-green-500'
-                      : match.result === 'lost'
-                      ? 'bg-red-500'
-                      : 'bg-yellow-300'
-                    }`}
+                      className={`w-3 h-3 rounded-full mt-1 ${
+                        match.result === 'won'
+                          ? 'bg-green-500'
+                          : match.result === 'lost'
+                          ? 'bg-red-500'
+                          : 'bg-yellow-300'
+                      }`}
                     ></div>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
 
@@ -471,12 +494,6 @@ type VVIP = {
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    Telegram Support
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
                     Access to VVIP Tips
                   </li>
                 </ul>
@@ -514,19 +531,7 @@ type VVIP = {
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    Premium Telegram Access
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
                     Access to VVIP Tips
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    Priority Support
                   </li>
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -569,19 +574,7 @@ type VVIP = {
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    VIP Telegram Group
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
                     Access to VVIP Tips
-                  </li>
-                  <li className="flex items-center">
-                    <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                    </svg>
-                    24/7 Premium Support
                   </li>
                   <li className="flex items-center">
                     <svg className="w-5 h-5 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -124,19 +124,7 @@ export default function DashboardPage() {
                 {/* User Info Section */}
                 <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
                     <div className="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                        {session?.user?.image ? (
-                            <img
-                                src={session.user.image}
-                                alt="Profile"
-                                className="w-16 h-16 rounded-full"
-                            />
-                        ) : (
-                            <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                                <span className="text-2xl text-gray-600">
-                                    {session?.user?.name?.[0] || 'U'}
-                                </span>
-                            </div>
-                        )}
+                        {/* Remove avatar image and initial */}
                         <div className="text-center sm:text-left">
                             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
                                 Welcome back, {session?.user?.name || localUsername || 'User'}!
