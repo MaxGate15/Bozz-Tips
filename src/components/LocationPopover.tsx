@@ -14,7 +14,7 @@ interface LocationPopoverProps {
   onClose: () => void;
   anchorRef: React.RefObject<HTMLButtonElement>;
   game_category: string;
-  price: number;
+  price: string;
 }
 
 async function getRate(currencyCode: string): Promise<number> {
@@ -98,7 +98,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
         key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
         username: username,
         
-        amount: price*rate,
+        amount: parseFloat(price)*rate,
         currency: currencyCode,
         ref: '' + Math.floor(Math.random() * 1000000000 + 1),
         metadata: {

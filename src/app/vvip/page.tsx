@@ -94,7 +94,7 @@ export default function VVIPPage() {
 
         {/* Packages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Daily Package */}{ !updateAvailable?.[0]?.vip && !updatePurchase?.[0]?.vip &&
+          {/* Daily Package */}{ updateAvailable?.[0]?.vip &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
@@ -140,7 +140,7 @@ export default function VVIPPage() {
           </div>}
 
           {/* Daily VVIP Plan 2 */}
-          { !updateAvailable?.[0]?.vvip2 && !updatePurchase?.[0]?.vvip2 &&
+          { updateAvailable?.[0]?.vvip2 &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
 `            <div className="p-6">`
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
@@ -195,7 +195,7 @@ export default function VVIPPage() {
             </div>
           </div>}
 
-          {/* Daily VVIP Plan 3 */}{ !updateAvailable?.[0]?.vvip3 && !updatePurchase?.[0]?.vvip3 &&
+          {/* Daily VVIP Plan 3 */}{ updateAvailable?.[0]?.vvip3  &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
