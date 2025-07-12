@@ -40,8 +40,8 @@ export default function VVIPPage() {
     loading,
     error,
   } = useUpdateCheck() as {
-    updateAvailable: Updates[] | null;
-    updatePurchase: Updates[] | null;
+    updateAvailable: Updates | null;
+    updatePurchase: Updates | null;
     loading: boolean | null;  
     error: string | null;
   };
@@ -94,7 +94,14 @@ export default function VVIPPage() {
 
         {/* Packages Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* Daily Package */}{ updateAvailable?.[0]?.vip &&
+          {!updateAvailable?.vvip1 && !updateAvailable?.vvip2 && !updateAvailable?.vvip3 && !updateAvailable?.vip &&(
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-4 text-red-600">No VVIP Plans Available</h3>
+                  <p className="text-gray-600">Currently, there are no VVIP plans available. Please check back later.</p>
+                </div>
+                </div>)}
+          {/* Daily Package */}{ updateAvailable?.vip &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN</h3>
@@ -118,7 +125,7 @@ export default function VVIPPage() {
               <button
                 ref={dailyBtnRef}
                 onClick={() => setOpenPopover('daily')}
-                disabled={!updateAvailable?.[0]?.vvip1 || updatePurchase?.[0]?.vvip1}
+                disabled={!updateAvailable?.vvip1 || updatePurchase?.vvip1}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
               >
                 SELECT PLAN
@@ -134,7 +141,7 @@ export default function VVIPPage() {
           </div>}
 
           {/* Daily VVIP Plan 2 */}
-          { updateAvailable?.[0]?.vvip2 &&
+          { updateAvailable?.vvip2 &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
 `            <div className="p-6">`
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 2</h3>
@@ -160,7 +167,7 @@ export default function VVIPPage() {
                 </li>
               </ul>
               <button
-                disabled={!updateAvailable?.[0]?.vvip2 || updatePurchase?.[0]?.vvip2}
+                disabled={!updateAvailable?.vvip2 || updatePurchase?.vvip2}
                 ref={weeklyBtnRef}
                 onClick={() => setOpenPopover('weekly')}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"
@@ -177,7 +184,7 @@ export default function VVIPPage() {
             </div>
           </div>}
 
-          {/* Daily VVIP Plan 3 */}{ updateAvailable?.[0]?.vvip3  &&
+          {/* Daily VVIP Plan 3 */}{ updateAvailable?.vvip3  &&
           <div className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="p-6">
               <h3 className="text-xl font-bold mb-4">DAILY VVIP PLAN 3</h3>
@@ -209,7 +216,7 @@ export default function VVIPPage() {
                 </li>
               </ul>
               <button
-                disabled={!updateAvailable?.[0]?.vvip3 || updatePurchase?.[0]?.vvip3} 
+                disabled={!updateAvailable?.vvip3 || updatePurchase?.vvip3} 
                 ref={monthlyBtnRef}
                 onClick={() => setOpenPopover('monthly')}
                 className="w-full bg-gradient-to-r from-blue-700 to-blue-900 text-white py-3 font-semibold hover:from-blue-800 hover:to-blue-950 transition-all"

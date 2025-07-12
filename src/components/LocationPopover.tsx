@@ -17,10 +17,9 @@ interface LocationPopoverProps {
   price: string;
 }
 
-async function getRate(currencyCode: string): Promise<number> {
-  if (currencyCode === 'GHS') return 1;
+async function getRate(): Promise<number> {
 
-  const response = await fetch(`https://api.exchangerate.host/latest?base=${currencyCode}&symbols=GHS`);
+  const response = await fetch(`https://open.er-api.com/v6/latest/USD`);
   const data = await response.json();
 
   if (!data || !data.rates || !data.rates.GHS) {
@@ -90,7 +89,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       return;
     }
     try {
-     const rate = await getRate('USD'); // e.g., 1 USD = 15.25 GHS
+     const rate = await getRate(); // e.g., 1 USD = 15.25 GHS
 
 
       const isNotGhana = selectedLocation === 'not-ghana';
