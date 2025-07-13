@@ -96,6 +96,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
       const handler = (window as any).PaystackPop.setup({
         key: 'pk_live_7b78cc04196ecfe3ae0a964af06d18540f4bd4d5',
         username: username,
+        email: "Kofiokolobaah@gmail.com",
         amount: Math.round(parseFloat(price) * rate * 100),
         currency: currencyCode,
         ref: '' + Math.floor(Math.random() * 1000000000 + 1),
