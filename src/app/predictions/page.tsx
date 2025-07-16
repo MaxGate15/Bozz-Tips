@@ -33,12 +33,7 @@ type Update = {
   vvip3:boolean;
 }
 
-// type VVIPGame = {
 
-// }
-
-// const [selectedDate, setSelectedDate] = useState(new Date());
-// const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 const [games, setGames] = useState<Game[]>([])
 const [yesterdayGames, setYesterdayGames] = useState<Game[]>([]);
 const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
