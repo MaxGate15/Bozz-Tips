@@ -127,13 +127,12 @@ export default function VVIPGamesPage() {
 
   useEffect(() => {
     const fetchGames = async () => {
-      const username = getUsername();
       try {
         
-        const response = await axios.get('https://admin.bozz-tips.me/goto-purchased-games/', {
+        const response = await axios.get('https://admin.bozz-tips.com/goto-purchased-games/', {
           headers: {
             'Content-Type': 'application/json',
-            'x-username': username,
+  
             
           },
           params: { date: selectedDate },

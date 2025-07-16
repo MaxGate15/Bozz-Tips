@@ -53,6 +53,7 @@ const LocationPopover: React.FC<LocationPopoverProps> = ({ isOpen, onClose, anch
     }
   }, [isOpen, anchorRef]);
 
+  
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (

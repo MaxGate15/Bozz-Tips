@@ -23,7 +23,11 @@ export default function VVIPPage() {
 
     []
   )
-
+  const its_time = (t: string | number | Date): boolean => {
+    const currentTime = new Date();
+    const targetTime = new Date(t);
+    return currentTime >= targetTime;
+  }
  
 
   type Updates = {

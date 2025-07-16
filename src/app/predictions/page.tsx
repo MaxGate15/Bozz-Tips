@@ -113,8 +113,9 @@ useEffect(() => {
   } else if (selectedDay === 'yesterday') {
     setGames(yesterday);
   } else if (selectedDay === 'other' && selectedDate) {
+    
     // Fetch games for the selected date
-    fetch(`/api/games?date=${selectedDate}`)
+    fetch(`https://admin.bozz-tips.com/goto-purchased-games/?date=${selectedDate}`)
       .then(res => res.json())
       .then(data => setGames(data))
       .catch(() => setGames([]));
