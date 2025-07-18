@@ -50,23 +50,10 @@ const useGames = () => {
 };
 
 const previousGames = (day) => {
-    const [otherGames, setOtherGames] = useState([]);
-    useEffect(() => {
-        const fetchPreviousGames = async () => {
-            try {
-                const response = await axios.get(`https://admin.bozz-tips.com/free-games/?date=${day}`);
-                
-                setOtherGames(extractGames(response.data));
-            } catch (err) {
-                console.error(`Error fetching ${day} games:`, err);
-                return [];
-            }
-        };
-
-        fetchPreviousGames();
-    }, [day]);
-    return otherGames;
+    
+        
+    
 };
 
 export default useGames;
-export { previousGames };
+export { extractGames };
