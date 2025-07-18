@@ -4,7 +4,7 @@ import React,{ useState,useEffect, useRef } from 'react';
 import LocationModal from '../../components/LocationModal';
 import usePreviousVipGames from '../freegames/PreviousVipGames';
 import LocationPopover from '../../components/LocationPopover';
-import useGames from '../freegames/FreeGames';
+import useGames,{previousGames} from '../freegames/FreeGames';
 import useUpdateCheck from '../UpdateCheck/Check';
 import DatePicker from 'react-datepicker';
 import axios from 'axios';
@@ -110,10 +110,8 @@ useEffect(() => {
   } else if (selectedDay === 'other' && selectedDate) {
     
     // Fetch games for the selected date
-    fetch(`https://admin.bozz-tips.com/goto-purchased-games/?date=${selectedDate}`)
-      .then(res => res.json())
-      .then(data => setGames(data))
-      .catch(() => setGames([]));
+    setGames(previousGames(selectedDate))
+    
   }
 }, [selectedDay, today, tomorrow, yesterday, selectedDate]);
 
