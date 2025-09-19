@@ -3,6 +3,31 @@
 import React, { useState, useEffect } from 'react';
 import { FaRegCalendarAlt, FaUsers, FaGamepad, FaBell, FaSms, FaCog, FaSignOutAlt, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes, FaUpload, FaDownload } from 'react-icons/fa';
 
+// Add types for games and slips to avoid implicit any
+type Game = {
+  team1?: string;
+  team2?: string;
+  odds?: number | string;
+  prediction?: string;
+  category?: string;
+  result?: 'Pending' | 'Won' | 'Lost' | string;
+  [key: string]: any;
+};
+
+type Slip = {
+  id: number;
+  uploadedAt: string;
+  sportyCode: string;
+  msportCode: string;
+  totalOdds: number;
+  games: Game[];
+  slipResult: string;
+  category: string;
+  price?: string;
+  published?: boolean;
+  publishedAt?: string;
+};
+
 export default function AdminDashboard() {
   const [isClient, setIsClient] = useState(false);
 
@@ -15,15 +40,17 @@ export default function AdminDashboard() {
   const [showSMS, setShowSMS] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('Slips');
   const [bookingCode, setBookingCode] = useState('');
-  const [loadedGames, setLoadedGames] = useState<{[key: string]: any[]}>({});
+  // typed per-category loaded games
+  const [loadedGames, setLoadedGames] = useState<{[key: string]: Game[]}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [totalOdds, setTotalOdds] = useState<{[key: string]: number}>({});
   const [currentBookingCode, setCurrentBookingCode] = useState<{[key: string]: string}>({});
   const [showAttachDropdown, setShowAttachDropdown] = useState(false);
   const [sportyCode, setSportyCode] = useState('');
   const [msportCode, setMsportCode] = useState('');
-  const [slips, setSlips] = useState<any[]>([]);
-  const [editingGame, setEditingGame] = useState<number | null>(null);
+  const [slips, setSlips] = useState<Slip[]>([]);
+  // editingGame stores a composite id like `${slip.id}-${gameIndex}` so use string|null
+  const [editingGame, setEditingGame] = useState<string | null>(null);
   const [expandedSlip, setExpandedSlip] = useState<number | null>(null);
   const [selectedSlips, setSelectedSlips] = useState<Set<number>>(new Set());
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -51,6 +78,88 @@ export default function AdminDashboard() {
   const [gamePrice, setGamePrice] = useState('');
   const [attachedBookings, setAttachedBookings] = useState<{[key: string]: {sportyCode: string, msportCode: string}}>({});
   const [gamePrices, setGamePrices] = useState<{[key: string]: string}>({});
+
+  // Dynamic total users fetched from local API
+  const [totalUsers, setTotalUsers] = useState<number | null>(null);
+
+  // Dynamic active games (pending slips) fetched from local API
+  const [activeGames, setActiveGames] = useState<number | null>(null);
+  // Dynamic VIP subscriptions (purchased slips)
+  const [purchasedSubs, setPurchasedSubs] = useState<number | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
+    const fetchTotalUsers = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/total-users/', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const value = typeof data.total_users === 'number' ? data.total_users : Number(data.total_users);
+        if (mounted && !Number.isNaN(value)) setTotalUsers(value);
+      } catch (err) {
+        console.error('Failed to fetch total users:', err);
+        if (mounted) setTotalUsers(null);
+      }
+    };
+
+    fetchTotalUsers();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, []);
+
+  // Fetch purchased slips count (VIP subscriptions)
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
+    const fetchPurchased = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/purchased-slips/', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const value = typeof data.purchased_slips === 'number' ? data.purchased_slips : Number(data.purchased_slips);
+        if (mounted && !Number.isNaN(value)) setPurchasedSubs(value);
+      } catch (err) {
+        console.error('Failed to fetch purchased slips:', err);
+        if (mounted) setPurchasedSubs(null);
+      }
+    };
+
+    fetchPurchased();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, []);
+
+  // Fetch pending slips count (active games)
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+
+    const fetchPending = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/pending-slips/', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const value = typeof data.pending_slips === 'number' ? data.pending_slips : Number(data.pending_slips);
+        if (mounted && !Number.isNaN(value)) setActiveGames(value);
+      } catch (err) {
+        console.error('Failed to fetch pending slips:', err);
+        if (mounted) setActiveGames(null);
+      }
+    };
+
+    fetchPending();
+    return () => {
+      mounted = false;
+      controller.abort();
+    };
+  }, []);
 
   const toggleVipStatus = (vipType: 'daily_vvip_plan' | 'daily_vvip_plan_2' | 'daily_vvip_plan_3' | 'vip_plan') => {
     setVipStatus(prev => ({
@@ -280,12 +389,12 @@ export default function AdminDashboard() {
 
   // Function to update game result
   const handleUpdateGameResult = (slipId: number, gameIndex: number, result: string) => {
-    setSlips(prevSlips => 
-      prevSlips.map(slip => 
-        slip.id === slipId 
+    setSlips(prevSlips =>
+      prevSlips.map(slip =>
+        slip.id === slipId
           ? {
               ...slip,
-              games: slip.games.map((game, index) => 
+              games: slip.games.map((game: any, index: number) =>
                 index === gameIndex ? { ...game, result } : game
               )
             }
@@ -364,7 +473,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-3xl font-bold text-blue-600">1,234</p>
+              <p className="text-3xl font-bold text-blue-600">{totalUsers !== null ? totalUsers.toLocaleString() : '—'}</p>
             </div>
             <div className="p-3 bg-blue-100 rounded-full">
               <FaUsers className="text-blue-600 text-xl" />
@@ -376,7 +485,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Active Games</p>
-              <p className="text-3xl font-bold text-green-600">45</p>
+              <p className="text-3xl font-bold text-green-600">{activeGames !== null ? activeGames.toLocaleString() : '—'}</p>
             </div>
             <div className="p-3 bg-green-100 rounded-full">
               <FaGamepad className="text-green-600 text-xl" />
@@ -388,7 +497,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">VIP Subscriptions</p>
-              <p className="text-3xl font-bold text-orange-600">89</p>
+              <p className="text-3xl font-bold text-orange-600">{purchasedSubs !== null ? purchasedSubs.toLocaleString() : '—'}</p>
             </div>
             <div className="p-3 bg-orange-100 rounded-full">
               <FaCheck className="text-orange-600 text-xl" />
@@ -556,9 +665,9 @@ export default function AdminDashboard() {
               </div>
               <button 
                 onClick={() => {
-                  setLoadedGames([]);
-                  setTotalOdds(0);
-                  setCurrentBookingCode('');
+                  setLoadedGames(prev => ({ ...prev, [selectedCategory]: [] }));
+                  setTotalOdds(prev => ({ ...prev, [selectedCategory]: 0 }));
+                  setCurrentBookingCode(prev => ({ ...prev, [selectedCategory]: '' }));
                 }}
                 className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
               >
@@ -709,7 +818,9 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex items-center gap-2">
                           {slip.published ? (
-                            <span className="text-green-600 text-sm font-medium">✓ Published</span>
+                            <span className="text-green-600 font-medium">
+                              ✓ Published on {slip.publishedAt ? new Date(slip.publishedAt).toLocaleString() : 'Unknown date'}
+                            </span>
                           ) : (
                             <span className="text-gray-400">
                               {expandedSlip === slip.id ? '▼' : '▶'}
@@ -805,7 +916,7 @@ export default function AdminDashboard() {
                             <div className="text-xs text-gray-500">
                               {slip.published ? (
                                 <span className="text-green-600 font-medium">
-                                  ✓ Published on {new Date(slip.publishedAt).toLocaleString()}
+                                  ✓ Published on {slip.publishedAt ? new Date(slip.publishedAt).toLocaleString() : 'Unknown date'}
                                 </span>
                               ) : (
                                 <span>Ready to publish results</span>
@@ -878,9 +989,9 @@ export default function AdminDashboard() {
               </div>
               <button 
                 onClick={() => {
-                  setLoadedGames([]);
-                  setTotalOdds(0);
-                  setCurrentBookingCode('');
+                  setLoadedGames(prev => ({ ...prev, [selectedCategory]: [] }));
+                  setTotalOdds(prev => ({ ...prev, [selectedCategory]: 0 }));
+                  setCurrentBookingCode(prev => ({ ...prev, [selectedCategory]: '' }));
                 }}
                 className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
               >
