@@ -93,7 +93,7 @@ export default function AdminDashboard() {
 
     const fetchTotalUsers = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/total-users/', { signal: controller.signal });
+        const res = await fetch('https://admin.bozz-tips.com/total-users/', { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const value = typeof data.total_users === 'number' ? data.total_users : Number(data.total_users);
@@ -118,7 +118,7 @@ export default function AdminDashboard() {
 
     const fetchPurchased = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/purchased-slips/', { signal: controller.signal });
+        const res = await fetch('https://admin.bozz-tips.com/purchased-slips/', { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const value = typeof data.purchased_slips === 'number' ? data.purchased_slips : Number(data.purchased_slips);
@@ -143,7 +143,7 @@ export default function AdminDashboard() {
 
     const fetchPending = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/pending-slips/', { signal: controller.signal });
+        const res = await fetch('https://admin.bozz-tips.com/pending-slips/', { signal: controller.signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         const value = typeof data.pending_slips === 'number' ? data.pending_slips : Number(data.pending_slips);
