@@ -5,67 +5,54 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   const { code } = await params;
+  // Fetch booking data from backend and transform to expected shape
+  try {
+    const backendUrl = `http://127.0.0.1:8000/load-booking/${encodeURIComponent(code)}/`;
+    const res = await fetch(backendUrl);
 
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 1000));
-
-  // Mock data based on the booking code
-  const mockGames = [
-    {
-      team1: "Bodoe/Glimt",
-      team2: "Kristiansund BK",
-      prediction: "1X2",
-      odds: "1.11",
-      category: "Home"
-    },
-    {
-      team1: "Paderborn",
-      team2: "Bochum",
-      prediction: "1X2",
-      odds: "1.97",
-      category: "Home"
-    },
-    {
-      team1: "Arminia Bielefeld",
-      team2: "1. FC Magdeburg",
-      prediction: "1X2",
-      odds: "2.15",
-      category: "Home"
-    },
-    {
-      team1: "Bayer Leverkusen",
-      team2: "Eintracht Frankfurt",
-      prediction: "1X2",
-      odds: "2.36",
-      category: "Home"
+    if (!res.ok) {
+      // Propagate backend error status
+      const text = await res.text().catch(() => '');
+      return NextResponse.json({ success: false, message: `Backend returned ${res.status}: ${text}` }, { status: res.status });
     }
-  ];
 
-  // Calculate total odds
-  const totalOdds = mockGames.reduce((total, game) => total * parseFloat(game.odds), 1).toFixed(2);
+    const data = await res.json();
 
-  // Simulate different responses based on code
-  if (code === 'INVALID' || code === 'ERROR') {
-    return NextResponse.json({
-      success: false,
-      message: 'Invalid booking code. Please check and try again.'
-    }, { status: 400 });
-  }
+    // Expect data.games to be an array
+    const rawGames = Array.isArray(data.games) ? data.games : [];
 
-  if (code === 'EMPTY') {
+    // Transform each game to the expected shape
+    const games = rawGames.map((g: any) => {
+      const team1 = g.home ?? g.team1 ?? '';
+      const team2 = g.away ?? g.team2 ?? '';
+      const prediction = g.prediction ?? '';
+      // Ensure odds is a string
+      const oddsValue = g.odd ?? g.odds ?? 0;
+      const odds = typeof oddsValue === 'number' ? oddsValue.toFixed(2) : String(oddsValue);
+      // Prefer tournament, fall back to sport
+      const category = g.tournament ?? g.sport ?? g.category ?? '';
+
+      return {
+        team1,
+        team2,
+        prediction,
+        odds,
+        category
+      };
+    });
+
+    // Calculate aggregated total odds (product of numeric odds)
+    const numericOdds = games.map(g => parseFloat(String(g.odds)) || 1);
+    const totalOdds = numericOdds.reduce((acc, v) => acc * v, 1);
+
     return NextResponse.json({
       success: true,
-      games: [],
-      totalOdds: 0,
-      message: 'No games found for this booking code.'
+      games,
+      totalOdds: totalOdds.toFixed(2),
+      message: `Successfully loaded ${games.length} games from booking code: ${code}`
     });
+  } catch (err: any) {
+    console.error('Error fetching booking from backend:', err);
+    return NextResponse.json({ success: false, message: 'Error fetching booking data' }, { status: 502 });
   }
-
-  // Return mock data for any other code
-  return NextResponse.json({
-    success: true,
-    games: mockGames,
-    totalOdds: totalOdds,
-    message: `Successfully loaded ${mockGames.length} games from booking code: ${code}`
-  });
 }

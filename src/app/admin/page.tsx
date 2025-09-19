@@ -86,6 +86,8 @@ export default function AdminDashboard() {
   const [activeGames, setActiveGames] = useState<number | null>(null);
   // Dynamic VIP subscriptions (purchased slips)
   const [purchasedSubs, setPurchasedSubs] = useState<number | null>(null);
+  // Available plans from backend
+  const [availablePlans, setAvailablePlans] = useState<{ vip?: boolean; vvip1?: boolean; vvip2?: boolean; vvip3?: boolean }>({});
 
   useEffect(() => {
     let mounted = true;
@@ -161,6 +163,61 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  // Fetch all slips from backend and store in state
+  const fetchSlips = async () => {
+    try {
+      const res = await fetch('http://127.0.0.1:8000/get-all-slips/');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const backendSlips = data.slips || [];
+      const mapped: Slip[] = backendSlips.map((s: any) => ({
+        id: s.slip_id ?? Date.now() + Math.random(),
+        uploadedAt: s.match_day && s.start_time ? `${s.match_day}T${s.start_time}` : (s.uploadedAt || new Date().toISOString()),
+        sportyCode: s.booking_code.sportyBet_code || 'N/A',
+        msportCode: s.booking_code.betWay_code || 'N/A',
+        totalOdds: s.total_odd ? Number(s.total_odd) : (s.totalOdd ?? 0),
+        games: (s.games || []).map((g: any) => ({
+          team1: g.team1 || g.home || '',
+          team2: g.team2 || g.away || '',
+          prediction: g.prediction || '',
+          odds: g.odd ?? g.odds ?? '',
+          category: g.tournament || g.sport || g.category || '',
+          result: g.result ? (typeof g.result === 'string' ? g.result : String(g.result)) : 'Pending'
+        })),
+        slipResult: s.slipResult || s.slip_result || 'Pending',
+        category: s.category || 'Free',
+        price: s.price || '0'
+      }));
+      setSlips(mapped);
+    } catch (err) {
+      console.error('Failed to fetch slips:', err);
+      // keep previous slips if any; optionally show alert
+    }
+  };
+
+  useEffect(() => {
+    fetchSlips();
+  }, []);
+
+  // Fetch available plans for VIP/VVIP cards
+  useEffect(() => {
+    let mounted = true;
+    const controller = new AbortController();
+    const fetchPlans = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/get-available-plans/', { signal: controller.signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (mounted) setAvailablePlans({ vip: !!data.vip, vvip1: !!data.vvip1, vvip2: !!data.vvip2, vvip3: !!data.vvip3 });
+      } catch (err) {
+        console.error('Failed to fetch available plans:', err);
+        if (mounted) setAvailablePlans({});
+      }
+    };
+    fetchPlans();
+    return () => { mounted = false; controller.abort(); };
+  }, []);
+
   const toggleVipStatus = (vipType: 'daily_vvip_plan' | 'daily_vvip_plan_2' | 'daily_vvip_plan_3' | 'vip_plan') => {
     setVipStatus(prev => ({
       ...prev,
@@ -180,7 +237,6 @@ export default function AdminDashboard() {
       return newSet;
     });
   };
-
   // Function to select all slips
   const selectAllSlips = () => {
     setSelectedSlips(new Set(slips.map(slip => slip.id)));
@@ -206,6 +262,83 @@ export default function AdminDashboard() {
     setSelectedSlips(new Set());
     setShowDeleteConfirm(false);
     alert(`${selectedSlips.size} slip(s) archived successfully. Users can still see their purchase history.`);
+  };
+
+  // Function to upload games to slips (creates a local slip and POSTs to backend)
+  const handleUploadGames = async () => {
+    const currentLoadedGames = loadedGames[selectedCategory] || [];
+    if (currentLoadedGames.length === 0) {
+      alert('No games to upload. Please load games first.');
+      return;
+    }
+
+    // Create ONE slip with all the games
+    const slip = {
+      id: Date.now() + Math.random(), // Unique slip ID
+      uploadedAt: new Date().toISOString(),
+      sportyCode: attachedBookings[selectedCategory]?.sportyCode || 'N/A',
+      msportCode: attachedBookings[selectedCategory]?.msportCode || 'N/A',
+      totalOdds: totalOdds[selectedCategory] || 0,
+      games: currentLoadedGames.map(game => ({
+        ...game,
+        result: 'Pending' // Default result for each game
+      })),
+      slipResult: 'Pending', // Overall slip result
+      category: selectedCategory,
+      price: gamePrices[selectedCategory] || '0'
+    };
+    console.log("Uploading slip:", slip);
+
+  // Try to POST the slip to backend
+    try {
+      const payload = {
+        ...slip,
+        totalOdds: String(slip.totalOdds),
+        games: slip.games.map((g: any) => ({
+          ...g,
+          odds: g.odds != null ? String(g.odds) : '',
+          category: (g.tournament || g.sport || g.category || '')
+        }))
+      };
+
+      const res = await fetch('http://127.0.0.1:8000/api/upload-slip/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.status === 201) {
+        // Optionally parse response and update UI
+        const respData = await res.json().catch(() => null);
+        if (respData && respData.id) {
+          // If backend returns an id, we will re-fetch the slips to get authoritative data
+        }
+        alert('Slip uploaded to backend successfully.');
+        // Refresh slips from backend to reflect saved data
+        await fetchSlips();
+      } else {
+        let errText = `Server responded with ${res.status}`;
+        try { const errBody = await res.json(); errText = errBody.message || JSON.stringify(errBody); } catch {}
+        alert(`Failed to upload slip: ${errText}`);
+      }
+    } catch (error: any) {
+      console.error('Upload slip error:', error);
+      alert(`Network error while uploading slip: ${error?.message || String(error)}`);
+    }
+
+    // Clear loaded games and codes for this category
+    setLoadedGames(prev => ({ ...prev, [selectedCategory]: [] }));
+    setTotalOdds(prev => ({ ...prev, [selectedCategory]: 0 }));
+    setCurrentBookingCode(prev => ({ ...prev, [selectedCategory]: '' }));
+    setBookingCode('');
+    setSportyCode('');
+    setMsportCode('');
+    setShowAttachDropdown(false);
+
+    // Switch to Slips category
+    setSelectedCategory('Slips');
+
+    alert(`Slip created successfully with ${currentLoadedGames.length} games!`);
   };
 
   // Function to handle new admin form submission
@@ -239,13 +372,7 @@ export default function AdminDashboard() {
       email: '',
       phone: '',
       role: 'admin',
-      permissions: {
-        games: true,
-        users: true,
-        notifications: true,
-        sms: true,
-        settings: false
-      }
+      permissions: { games: true, users: true, notifications: true, sms: true, settings: false }
     });
     setShowAddAdminModal(false);
   };
@@ -338,54 +465,55 @@ export default function AdminDashboard() {
   };
 
   // Function to upload games to slips
-  const handleUploadGames = () => {
-    const currentLoadedGames = loadedGames[selectedCategory] || [];
-    if (currentLoadedGames.length === 0) {
-      alert('No games to upload. Please load games first.');
-      return;
-    }
+  // const handleUploadGames = () => {
+  //   const currentLoadedGames = loadedGames[selectedCategory] || [];
+  //   if (currentLoadedGames.length === 0) {
+  //     alert('No games to upload. Please load games first.');
+  //     return;
+  //   }
 
-    // Create ONE slip with all the games
-    const slip = {
-      id: Date.now() + Math.random(), // Unique slip ID
-      uploadedAt: new Date().toISOString(),
-      sportyCode: attachedBookings[selectedCategory]?.sportyCode || 'N/A',
-      msportCode: attachedBookings[selectedCategory]?.msportCode || 'N/A',
-      totalOdds: totalOdds[selectedCategory] || 0,
-      games: currentLoadedGames.map(game => ({
-        ...game,
-        result: 'Pending' // Default result for each game
-      })),
-      slipResult: 'Pending', // Overall slip result
-      category: selectedCategory,
-      price: gamePrices[selectedCategory] || '0'
-    };
+  //   // Create ONE slip with all the games
+  //   const slip = {
+  //     id: Date.now() + Math.random(), // Unique slip ID
+  //     uploadedAt: new Date().toISOString(),
+  //     sportyCode: attachedBookings[selectedCategory]?.sportyCode || 'N/A',
+  //     msportCode: attachedBookings[selectedCategory]?.msportCode || 'N/A',
+  //     totalOdds: totalOdds[selectedCategory] || 0,
+  //     games: currentLoadedGames.map(game => ({
+  //       ...game,
+  //       result: 'Pending' // Default result for each game
+  //     })),
+  //     slipResult: 'Pending', // Overall slip result
+  //     category: selectedCategory,
+  //     price: gamePrices[selectedCategory] || '0'
+  //   };
 
-    setSlips(prevSlips => [...prevSlips, slip]);
+  //   setSlips(prevSlips => [...prevSlips, slip]);
     
-    // Clear loaded games and codes for this category
-    setLoadedGames(prev => ({
-      ...prev,
-      [selectedCategory]: []
-    }));
-    setTotalOdds(prev => ({
-      ...prev,
-      [selectedCategory]: 0
-    }));
-    setCurrentBookingCode(prev => ({
-      ...prev,
-      [selectedCategory]: ''
-    }));
-    setBookingCode('');
-    setSportyCode('');
-    setMsportCode('');
-    setShowAttachDropdown(false);
+  //   // Clear loaded games and codes for this category
+  //   setLoadedGames(prev => ({
+  //     ...prev,
+  //     [selectedCategory]: []
+  //   }));
+  //   setTotalOdds(prev => ({
+  //     ...prev,
+  //     [selectedCategory]: 0
+  //   }));
+  //   setCurrentBookingCode(prev => ({
+  //     ...prev,
+  //     [selectedCategory]: ''
+  //   }));
+  //   setBookingCode('');
+  //   setSportyCode('');
+  //   setMsportCode('');
+  //   setShowAttachDropdown(false);
+  //   console.log("Uploaded slip:", slip);
     
-    // Switch to Slips category
-    setSelectedCategory('Slips');
+  //   // Switch to Slips category
+  //   setSelectedCategory('Slips');
     
-    alert(`Slip created successfully with ${currentLoadedGames.length} games!`);
-  };
+  //   alert(`Slip created successfully with ${currentLoadedGames.length} games!`);
+  // };
 
   // Function to update game result
   const handleUpdateGameResult = (slipId: number, gameIndex: number, result: string) => {
@@ -1067,99 +1195,107 @@ export default function AdminDashboard() {
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-gray-800">VIP Games Control</h2>
         
-        {/* VIP Package Cards */}
+        {/* VIP Package Cards - render only when available according to backend */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-lg shadow-md border">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN</h3>
-              <span className={`px-3 py-1 rounded text-sm ${
-                vipStatus.daily_vvip_plan === 'sold_out' 
-                  ? 'bg-orange-500 text-white' 
-                  : 'bg-green-500 text-white'
-              }`}>
-                {vipStatus.daily_vvip_plan === 'sold_out' ? 'Sold Out' : 'Available'}
-              </span>
+          {availablePlans.vvip1 && (
+            <div className="bg-white p-6 rounded-lg shadow-md border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN</h3>
+                <span className={`px-3 py-1 rounded text-sm ${
+                  vipStatus.daily_vvip_plan === 'sold_out' 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-green-500 text-white'
+                }`}>
+                  {vipStatus.daily_vvip_plan === 'sold_out' ? 'Sold Out' : 'Available'}
+                </span>
+              </div>
+              <button 
+                onClick={() => toggleVipStatus('daily_vvip_plan')}
+                className={`w-full mt-4 py-2 rounded font-medium ${
+                  vipStatus.daily_vvip_plan === 'sold_out'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {vipStatus.daily_vvip_plan === 'sold_out' ? 'Available' : 'Sold Out'}
+              </button>
             </div>
-            <button 
-              onClick={() => toggleVipStatus('daily_vvip_plan')}
-              className={`w-full mt-4 py-2 rounded font-medium ${
-                vipStatus.daily_vvip_plan === 'sold_out'
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-orange-600 text-white hover:bg-orange-700'
-              }`}
-            >
-              {vipStatus.daily_vvip_plan === 'sold_out' ? 'Available' : 'Sold Out'}
-            </button>
-          </div>
+          )}
 
-          <div className="bg-white p-6 rounded-lg shadow-md border">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 2</h3>
-              <span className={`px-3 py-1 rounded text-sm ${
-                vipStatus.daily_vvip_plan_2 === 'sold_out' 
-                  ? 'bg-orange-500 text-white' 
-                  : 'bg-green-500 text-white'
-              }`}>
-                {vipStatus.daily_vvip_plan_2 === 'sold_out' ? 'Sold Out' : 'Available'}
-              </span>
+          {availablePlans.vvip2 && (
+            <div className="bg-white p-6 rounded-lg shadow-md border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 2</h3>
+                <span className={`px-3 py-1 rounded text-sm ${
+                  vipStatus.daily_vvip_plan_2 === 'sold_out' 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-green-500 text-white'
+                }`}>
+                  {vipStatus.daily_vvip_plan_2 === 'sold_out' ? 'Sold Out' : 'Available'}
+                </span>
+              </div>
+              <button 
+                onClick={() => toggleVipStatus('daily_vvip_plan_2')}
+                className={`w-full mt-4 py-2 rounded font-medium ${
+                  vipStatus.daily_vvip_plan_2 === 'sold_out'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {vipStatus.daily_vvip_plan_2 === 'sold_out' ? 'Available' : 'Sold Out'}
+              </button>
             </div>
-            <button 
-              onClick={() => toggleVipStatus('daily_vvip_plan_2')}
-              className={`w-full mt-4 py-2 rounded font-medium ${
-                vipStatus.daily_vvip_plan_2 === 'sold_out'
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-orange-600 text-white hover:bg-orange-700'
-              }`}
-            >
-              {vipStatus.daily_vvip_plan_2 === 'sold_out' ? 'Available' : 'Sold Out'}
-            </button>
-          </div>
+          )}
 
-          <div className="bg-white p-6 rounded-lg shadow-md border">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 3</h3>
-              <span className={`px-3 py-1 rounded text-sm ${
-                vipStatus.daily_vvip_plan_3 === 'sold_out' 
-                  ? 'bg-orange-500 text-white' 
-                  : 'bg-green-500 text-white'
-              }`}>
-                {vipStatus.daily_vvip_plan_3 === 'sold_out' ? 'Sold Out' : 'Available'}
-              </span>
+          {availablePlans.vvip3 && (
+            <div className="bg-white p-6 rounded-lg shadow-md border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 3</h3>
+                <span className={`px-3 py-1 rounded text-sm ${
+                  vipStatus.daily_vvip_plan_3 === 'sold_out' 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-green-500 text-white'
+                }`}>
+                  {vipStatus.daily_vvip_plan_3 === 'sold_out' ? 'Sold Out' : 'Available'}
+                </span>
+              </div>
+              <button 
+                onClick={() => toggleVipStatus('daily_vvip_plan_3')}
+                className={`w-full mt-4 py-2 rounded font-medium ${
+                  vipStatus.daily_vvip_plan_3 === 'sold_out'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {vipStatus.daily_vvip_plan_3 === 'sold_out' ? 'Available' : 'Sold Out'}
+              </button>
             </div>
-            <button 
-              onClick={() => toggleVipStatus('daily_vvip_plan_3')}
-              className={`w-full mt-4 py-2 rounded font-medium ${
-                vipStatus.daily_vvip_plan_3 === 'sold_out'
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-orange-600 text-white hover:bg-orange-700'
-              }`}
-            >
-              {vipStatus.daily_vvip_plan_3 === 'sold_out' ? 'Available' : 'Sold Out'}
-            </button>
-          </div>
+          )}
 
-          <div className="bg-white p-6 rounded-lg shadow-md border">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">VIP PLAN</h3>
-              <span className={`px-3 py-1 rounded text-sm ${
-                vipStatus.vip_plan === 'sold_out' 
-                  ? 'bg-orange-500 text-white' 
-                  : 'bg-green-500 text-white'
-              }`}>
-                {vipStatus.vip_plan === 'sold_out' ? 'Sold Out' : 'Available'}
-              </span>
+          {availablePlans.vip && (
+            <div className="bg-white p-6 rounded-lg shadow-md border">
+              <div className="flex justify-between items-start mb-4">
+                <h3 className="text-lg font-semibold text-gray-800">VIP PLAN</h3>
+                <span className={`px-3 py-1 rounded text-sm ${
+                  vipStatus.vip_plan === 'sold_out' 
+                    ? 'bg-orange-500 text-white' 
+                    : 'bg-green-500 text-white'
+                }`}>
+                  {vipStatus.vip_plan === 'sold_out' ? 'Sold Out' : 'Available'}
+                </span>
+              </div>
+              <button 
+                onClick={() => toggleVipStatus('vip_plan')}
+                className={`w-full mt-4 py-2 rounded font-medium ${
+                  vipStatus.vip_plan === 'sold_out'
+                    ? 'bg-green-600 text-white hover:bg-green-700'
+                    : 'bg-orange-600 text-white hover:bg-orange-700'
+                }`}
+              >
+                {vipStatus.vip_plan === 'sold_out' ? 'Available' : 'Sold Out'}
+              </button>
             </div>
-            <button 
-              onClick={() => toggleVipStatus('vip_plan')}
-              className={`w-full mt-4 py-2 rounded font-medium ${
-                vipStatus.vip_plan === 'sold_out'
-                  ? 'bg-green-600 text-white hover:bg-green-700'
-                  : 'bg-orange-600 text-white hover:bg-orange-700'
-              }`}
-            >
-              {vipStatus.vip_plan === 'sold_out' ? 'Available' : 'Sold Out'}
-            </button>
-          </div>
+          )}
         </div>
       </div>
     );
