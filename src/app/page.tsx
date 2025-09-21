@@ -148,23 +148,23 @@ const Home: React.FC = () => {
                   {/* Centered Modal */}
                   <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
                     <div className="bg-white border border-blue-200 rounded-lg shadow-lg p-4 w-[95vw] max-w-xs sm:w-auto sm:max-w-none pointer-events-auto">
-                      <DatePicker
-                        selected={calendarDate}
-                        onChange={(date: Date | null) => {
-                          setCalendarDate(date);
-                          setShowDatePicker(false);
-                          if (date) {
-                            const formatted = date.toISOString().split('T')[0];
-                            setSelectedDate(formatted);
-                            setSelectedDay('other');
-                          }
-                        }}
-                        maxDate={new Date()}
-                        inline
-                        showMonthDropdown
-                        showYearDropdown
-                        dropdownMode="select"
-                      />
+                    <DatePicker
+                      selected={calendarDate}
+                      onChange={(date: Date | null) => {
+                        setCalendarDate(date);
+                        setShowDatePicker(false);
+                        if (date) {
+                          const formatted = date.toISOString().split('T')[0];
+                          setSelectedDate(formatted);
+                          setSelectedDay('other');
+                        }
+                      }}
+                      maxDate={new Date()}
+                      inline
+                      showMonthDropdown
+                      showYearDropdown
+                      dropdownMode="select"
+                    />
                     </div>
                   </div>
                 </>
@@ -208,8 +208,8 @@ const Home: React.FC = () => {
                   formattedTime = match.time_created;
                 }
                 return (
-                  <div
-                    key={index}
+                <div
+                  key={index}
                     className="bg-white border-b border-gray-100 py-2 sm:py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between hover:bg-gray-50 transition-colors px-1 sm:px-3 text-xs sm:text-sm"
                     style={{ minHeight: '40px', maxWidth: '100%' }}
                   >
@@ -301,10 +301,10 @@ const Home: React.FC = () => {
                           )}
                         </button>
                       </div>
-                    </div>
+                  </div>
                   )}
                 </div>
-              )}
+            )}
             </div>
             {/* Unlock More Button */}
             <div className="text-center mt-12">
