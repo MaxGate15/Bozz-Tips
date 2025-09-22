@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
+    phone: '',
     password: '',
     confirmPassword: ''
   });
@@ -26,6 +27,10 @@ export default function RegisterPage() {
     e.preventDefault();
     // TODO: Implement registration logic
     try {
+      if (formData.password !== formData.confirmPassword) {
+        alert('Passwords do not match.');
+        return;
+      }
       const response = await fetch('https://admin.bozz-tips.com/api/signup/', {
         method: 'POST',
         headers: {
@@ -41,6 +46,7 @@ export default function RegisterPage() {
           username: '',
           confirmPassword: '',
           email: '',
+          phone: '',
           password: '',
         });
         alert('Signup successful! You can now log in.');
@@ -96,6 +102,25 @@ export default function RegisterPage() {
                   autoComplete="email"
                   required
                   value={formData.email}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                  Phone number
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
+                  required
+                  pattern="[+0-9()\-\s]{7,20}"
+                  title="Enter a valid phone number"
+                  value={formData.phone}
                   onChange={handleChange}
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500"
                 />
