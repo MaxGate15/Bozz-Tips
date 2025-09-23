@@ -48,7 +48,7 @@ export default function Home() {
       >
         <h2 className="text-2xl font-bold mb-2">Contact Us</h2>
         <a
-          href="https://t.me/bozztipsadmin"
+          href="https://t.me/+AdZyJL_W2y8xZDg0"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline text-lg"

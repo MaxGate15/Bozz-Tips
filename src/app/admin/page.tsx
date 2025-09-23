@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaRegCalendarAlt, FaUsers, FaGamepad, FaBell, FaSms, FaCog, FaSignOutAlt, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes, FaUpload, FaDownload } from 'react-icons/fa';
+import { FaRegCalendarAlt, FaUsers, FaGamepad, FaBell, FaSms, FaCog, FaSignOutAlt, FaPlus, FaEdit, FaTrash, FaCheck, FaTimes, FaUpload, FaDownload, FaBars, FaTimes as FaClose } from 'react-icons/fa';
 
 // Add types for games and slips to avoid implicit any
 type Game = {
@@ -67,18 +67,19 @@ export default function AdminDashboard() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddAdminModal, setShowAddAdminModal] = useState(false);
   const [newAdmin, setNewAdmin] = useState({
-    name: '',
-    email: '',
-    phone: '',
+    username: '',
     role: 'admin',
     permissions: {
       games: true,
       users: true,
       notifications: true,
       sms: true,
-      settings: false
+      settings: true
     }
   });
+  const [userSearchResult, setUserSearchResult] = useState<any>(null);
+  const [isSearchingUser, setIsSearchingUser] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [vipStatus, setVipStatus] = useState({
     daily_vvip_plan: 'pending',
     daily_vvip_plan_2: 'pending',
@@ -196,7 +197,7 @@ export default function AdminDashboard() {
         id: s.slip_id ?? Date.now() + Math.random(),
         uploadedAt: s.match_day && s.start_time ? `${s.match_day}T${s.start_time}` : (s.uploadedAt || new Date().toISOString()),
         sportyCode: s.booking_code.sportyBet_code || 'N/A',
-        msportCode: s.booking_code.betWay_code || 'N/A',
+        msportCode: s.booking_code.msport_code || 'N/A',
         totalOdds: s.total_odd ? Number(s.total_odd) : (s.totalOdd ?? 0),
         games: (s.games || []).map((g: any) => ({
           id: g.game_id ?? g.id ?? g.gameId ?? Date.now() + Math.random(),
@@ -569,40 +570,89 @@ useEffect(() => {
     alert(`Slip created successfully with ${currentLoadedGames.length} games!`);
   };
 
+  // Function to search for user by username
+  const searchUserByUsername = async () => {
+    if (!newAdmin.username.trim()) {
+      alert('Please enter a username to search');
+      return;
+    }
+
+    setIsSearchingUser(true);
+    try {
+      // Search for user in the existing users list
+      const foundUser = users.find(user => 
+        user.username.toLowerCase() === newAdmin.username.toLowerCase() ||
+        user.username.toLowerCase().replace('@', '') === newAdmin.username.toLowerCase().replace('@', '')
+      );
+
+      if (foundUser) {
+        setUserSearchResult(foundUser);
+        alert(`User found: ${foundUser.name} (${foundUser.username})`);
+      } else {
+        setUserSearchResult(null);
+        alert('User not found. Please check the username and try again.');
+      }
+    } catch (error) {
+      console.error('Error searching for user:', error);
+      alert('Error searching for user. Please try again.');
+    } finally {
+      setIsSearchingUser(false);
+    }
+  };
+
   // Function to handle new admin form submission
-  const handleAddAdmin = () => {
-    if (!newAdmin.name.trim() || !newAdmin.email.trim() || !newAdmin.phone.trim()) {
-      alert('Please fill in all required fields');
+  const handleAddAdmin = async () => {
+    if (!newAdmin.username.trim()) {
+      alert('Please enter a username');
       return;
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(newAdmin.email)) {
-      alert('Please enter a valid email address');
+    if (!userSearchResult) {
+      alert('Please search and verify the user first');
       return;
     }
 
-    // Validate phone format (basic validation)
-    const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
-    if (!phoneRegex.test(newAdmin.phone.replace(/\s/g, ''))) {
-      alert('Please enter a valid phone number');
-      return;
-    }
+    // Use the permissions based on the selected role
+    const adminPermissions = {
+      ...newAdmin.permissions
+    };
 
-    // Here you would typically send the data to your backend
-    console.log('New Admin Data:', newAdmin);
-    alert(`New ${newAdmin.role} added successfully!`);
+    try {
+      // Here you would send the data to your backend to promote user to admin
+      const adminData = {
+        username: newAdmin.username,
+        userId: userSearchResult.id,
+        role: newAdmin.role,
+        permissions: adminPermissions
+      };
+
+      console.log('Promoting user to admin:', adminData);
+      
+      // Simulate API call - replace with actual backend call
+      // const response = await fetch('/api/admin/promote-user', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(adminData)
+      // });
+
+      alert(`User ${userSearchResult.name} has been promoted to ${newAdmin.role} successfully!`);
     
     // Reset form
     setNewAdmin({
-      name: '',
-      email: '',
-      phone: '',
+        username: '',
       role: 'admin',
-      permissions: { games: true, users: true, notifications: true, sms: true, settings: false }
+        permissions: { games: true, users: true, notifications: true, sms: true, settings: true }
     });
+      setUserSearchResult(null);
     setShowAddAdminModal(false);
+      
+      // Refresh users list to show updated roles
+      // await fetchUsers();
+      
+    } catch (error) {
+      console.error('Error promoting user to admin:', error);
+      alert('Error promoting user to admin. Please try again.');
+    }
   };
 
   // Function to handle role change and update permissions
@@ -616,40 +666,22 @@ useEffect(() => {
     };
 
     switch (role) {
-      case 'super_admin':
-        permissions = {
-          games: true,
-          users: true,
-          notifications: true,
-          sms: true,
-          settings: true
-        };
-        break;
       case 'admin':
         permissions = {
           games: true,
           users: true,
           notifications: true,
           sms: true,
-          settings: false
+          settings: true // Admin can add other admins
         };
         break;
-      case 'moderator':
+      case 'staff':
         permissions = {
           games: true,
-          users: false,
-          notifications: true,
-          sms: false,
-          settings: false
-        };
-        break;
-      case 'support':
-        permissions = {
-          games: false,
           users: true,
           notifications: true,
           sms: true,
-          settings: false
+          settings: false // Staff cannot add other admins
         };
         break;
     }
@@ -878,39 +910,39 @@ useEffect(() => {
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
       
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md border">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Total Users</p>
-              <p className="text-3xl font-bold text-blue-600">{totalUsers !== null ? totalUsers.toLocaleString() : '—'}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{totalUsers !== null ? totalUsers.toLocaleString() : '—'}</p>
             </div>
-            <div className="p-3 bg-blue-100 rounded-full">
-              <FaUsers className="text-blue-600 text-xl" />
+            <div className="p-2 sm:p-3 bg-blue-100 rounded-full">
+              <FaUsers className="text-blue-600 text-lg sm:text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md border">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">Active Games</p>
-              <p className="text-3xl font-bold text-green-600">{activeGames !== null ? activeGames.toLocaleString() : '—'}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600">{activeGames !== null ? activeGames.toLocaleString() : '—'}</p>
             </div>
-            <div className="p-3 bg-green-100 rounded-full">
-              <FaGamepad className="text-green-600 text-xl" />
+            <div className="p-2 sm:p-3 bg-green-100 rounded-full">
+              <FaGamepad className="text-green-600 text-lg sm:text-xl" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md border">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-600">VIP Subscriptions</p>
-              <p className="text-3xl font-bold text-orange-600">{purchasedSubs !== null ? purchasedSubs.toLocaleString() : '—'}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-orange-600">{purchasedSubs !== null ? purchasedSubs.toLocaleString() : '—'}</p>
             </div>
-            <div className="p-3 bg-orange-100 rounded-full">
-              <FaCheck className="text-orange-600 text-xl" />
+            <div className="p-2 sm:p-3 bg-orange-100 rounded-full">
+              <FaCheck className="text-orange-600 text-lg sm:text-xl" />
             </div>
           </div>
         </div>
@@ -942,19 +974,19 @@ useEffect(() => {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-bold text-gray-800">Games Management</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Games Management</h2>
         </div>
 
         {/* Filter Games by Category Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Filter Games by Category</h3>
-          <div className="flex flex-wrap gap-3">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-4">Filter Games by Category</h3>
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             <button 
               onClick={() => {
                 setSelectedCategory('Slips');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'Slips' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -967,7 +999,7 @@ useEffect(() => {
                 setSelectedCategory('Free');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'Free' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -980,7 +1012,7 @@ useEffect(() => {
                 setSelectedCategory('DAILY VVIP PLAN');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'DAILY VVIP PLAN' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -993,7 +1025,7 @@ useEffect(() => {
                 setSelectedCategory('DAILY VVIP PLAN 2');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'DAILY VVIP PLAN 2' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -1006,7 +1038,7 @@ useEffect(() => {
                 setSelectedCategory('DAILY VVIP PLAN 3');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'DAILY VVIP PLAN 3' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -1019,7 +1051,7 @@ useEffect(() => {
                 setSelectedCategory('VIP PLAN');
                 setBookingCode('');
               }}
-              className={`px-4 py-2 rounded-lg font-medium ${
+              className={`px-3 sm:px-4 py-2 rounded-lg font-medium text-sm sm:text-base ${
                 selectedCategory === 'VIP PLAN' 
                   ? 'bg-blue-600 text-white' 
                   : 'bg-gray-600 text-white hover:bg-gray-700'
@@ -1478,11 +1510,11 @@ useEffect(() => {
         <h2 className="text-2xl font-bold text-gray-800">VIP Games Control</h2>
         
         {/* VIP Package Cards - render only when available according to backend */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {availablePlans.vvip1 && (
-            <div className="bg-white p-6 rounded-lg shadow-md border">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">DAILY VVIP PLAN</h3>
                 <span className={`px-3 py-1 rounded text-sm ${
                   vipStatus.daily_vvip_plan === 'sold' 
                     ? 'bg-orange-500 text-white' 
@@ -1512,9 +1544,9 @@ useEffect(() => {
           )}
 
           {availablePlans.vvip2 && (
-            <div className="bg-white p-6 rounded-lg shadow-md border">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 2</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">DAILY VVIP PLAN 2</h3>
                 <span className={`px-3 py-1 rounded text-sm ${
                   vipStatus.daily_vvip_plan_2 === 'sold' 
                     ? 'bg-orange-500 text-white' 
@@ -1544,9 +1576,9 @@ useEffect(() => {
           )}
 
           {availablePlans.vvip3 && (
-            <div className="bg-white p-6 rounded-lg shadow-md border">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">DAILY VVIP PLAN 3</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">DAILY VVIP PLAN 3</h3>
                 <span className={`px-3 py-1 rounded text-sm ${
                   vipStatus.daily_vvip_plan_3 === 'sold' 
                     ? 'bg-orange-500 text-white' 
@@ -1576,9 +1608,9 @@ useEffect(() => {
           )}
 
           {availablePlans.vip && (
-            <div className="bg-white p-6 rounded-lg shadow-md border">
+            <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md border">
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-lg font-semibold text-gray-800">VIP PLAN</h3>
+                <h3 className="text-base sm:text-lg font-semibold text-gray-800">VIP PLAN</h3>
                 <span className={`px-3 py-1 rounded text-sm ${
                   vipStatus.vip_plan === 'sold' 
                     ? 'bg-orange-500 text-white' 
@@ -1767,7 +1799,7 @@ useEffect(() => {
           onClick={() => setShowAddAdminModal(true)}
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
-          <FaPlus /> Add New Admin
+          <FaPlus /> Promote User to Admin
         </button>
       </div>
 
@@ -1863,16 +1895,26 @@ useEffect(() => {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-blue-900 text-white shadow-lg">
-        <div className="px-6 py-4">
+        <div className="px-4 sm:px-6 py-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">Bozz Tips Admin</h1>
-              <p className="text-blue-200">Control Panel</p>
-            </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm">Admin User</span>
-              <button className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-2">
-                <FaSignOutAlt /> Logout
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 rounded-lg hover:bg-blue-800 transition-colors"
+              >
+                <FaBars className="text-xl" />
+              </button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold">Bozz Tips Admin</h1>
+                <p className="text-blue-200 text-sm sm:text-base">Control Panel</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="text-sm hidden sm:block">Admin User</span>
+              <button className="bg-red-600 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-red-700 flex items-center gap-1 sm:gap-2 text-sm sm:text-base">
+                <FaSignOutAlt className="text-sm sm:text-base" /> 
+                <span className="hidden sm:inline">Logout</span>
               </button>
             </div>
           </div>
@@ -1880,16 +1922,42 @@ useEffect(() => {
       </header>
 
       <div className="flex">
+        {/* Mobile Overlay */}
+        {isMobileMenuOpen && (
+          <div 
+            className="fixed inset-0 bg-blue-900 bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
+
         {/* Sidebar Navigation */}
-        <nav className="w-64 bg-white shadow-lg min-h-screen">
+        <nav className={`
+          fixed lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-50
+          w-64 bg-white shadow-lg min-h-screen lg:min-h-0
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+        `}>
           <div className="p-4">
+            {/* Mobile Close Button */}
+            <div className="flex justify-between items-center mb-4 lg:hidden">
+              <h2 className="text-lg font-semibold text-gray-800">Menu</h2>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <FaClose className="text-xl text-gray-600" />
+              </button>
+            </div>
+            
             <ul className="space-y-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <li key={tab.id}>
                     <button
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        setIsMobileMenuOpen(false); // Close mobile menu when tab is selected
+                      }}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                         activeTab === tab.id
                           ? 'bg-blue-600 text-white'
@@ -1907,7 +1975,7 @@ useEffect(() => {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 sm:p-6 lg:ml-0">
           {renderContent()}
         </main>
       </div>
@@ -1916,7 +1984,7 @@ useEffect(() => {
       {showAttachDropdown && (
         <div className="fixed inset-0 z-40" onClick={() => setShowAttachDropdown(false)}>
           <div 
-            className="absolute top-40 right-6 bg-white rounded-lg shadow-lg border p-3 w-64 z-50"
+            className="absolute top-40 right-2 sm:right-6 bg-white rounded-lg shadow-lg border p-3 w-[calc(100vw-1rem)] sm:w-64 z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-3">
@@ -1987,7 +2055,7 @@ useEffect(() => {
       {showPriceModal && (
         <div className="fixed inset-0 z-40" onClick={() => setShowPriceModal(false)}>
           <div 
-            className="absolute top-40 right-6 bg-white rounded-lg shadow-lg border p-3 w-64 z-50"
+            className="absolute top-40 right-2 sm:right-6 bg-white rounded-lg shadow-lg border p-3 w-[calc(100vw-1rem)] sm:w-64 z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-3">
@@ -2053,7 +2121,7 @@ useEffect(() => {
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50" onClick={() => setShowDeleteConfirm(false)}>
           <div 
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg border p-6 w-96 z-50"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg border p-4 sm:p-6 w-[95vw] sm:w-96 z-50"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
@@ -2099,11 +2167,11 @@ useEffect(() => {
       {showAddAdminModal && (
         <div className="fixed inset-0 z-50" onClick={() => setShowAddAdminModal(false)}>
           <div 
-            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg border p-6 w-96 z-50 max-h-[90vh] overflow-y-auto"
+            className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-lg border p-4 sm:p-6 w-[95vw] sm:w-96 z-50 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-800">Add New Admin</h3>
+              <h3 className="text-lg font-semibold text-gray-800">Promote User to Admin</h3>
               <button
                 onClick={() => setShowAddAdminModal(false)}
                 className="text-gray-400 hover:text-gray-600 text-xl"
@@ -2113,45 +2181,52 @@ useEffect(() => {
             </div>
             
             <div className="space-y-4">
-              {/* Basic Information */}
+              {/* Username Search */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Full Name *
+                  Username *
                 </label>
+                <div className="flex gap-2">
                 <input
                   type="text"
-                  value={newAdmin.name}
-                  onChange={(e) => setNewAdmin(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Enter full name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                    value={newAdmin.username}
+                    onChange={(e) => setNewAdmin(prev => ({ ...prev, username: e.target.value }))}
+                    placeholder="Enter username (e.g., @alex_smith or alex_smith)"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <button
+                    onClick={searchUserByUsername}
+                    disabled={isSearchingUser || !newAdmin.username.trim()}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSearchingUser ? 'Searching...' : 'Search'}
+                  </button>
+              </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the username of an existing user to promote to admin
+                </p>
               </div>
 
+              {/* User Search Result */}
+              {userSearchResult && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center text-white text-sm font-semibold">
+                      {userSearchResult.initials}
+                    </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email Address *
-                </label>
-                <input
-                  type="email"
-                  value={newAdmin.email}
-                  onChange={(e) => setNewAdmin(prev => ({ ...prev, email: e.target.value }))}
-                  placeholder="Enter email address"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+                      <div className="text-sm font-medium text-gray-900">{userSearchResult.name}</div>
+                      <div className="text-sm text-gray-600">{userSearchResult.username}</div>
+                      <div className="text-xs text-gray-500">{userSearchResult.email}</div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  value={newAdmin.phone}
-                  onChange={(e) => setNewAdmin(prev => ({ ...prev, phone: e.target.value }))}
-                  placeholder="Enter phone number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
+                  </div>
+                  <div className="mt-2">
+                    <span className="text-xs text-green-700 bg-green-100 px-2 py-1 rounded">
+                      ✓ User found and ready to promote
+                    </span>
+                  </div>
+                </div>
+              )}
 
               {/* Role Selection */}
               <div>
@@ -2163,10 +2238,8 @@ useEffect(() => {
                   onChange={(e) => handleRoleChange(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="admin">Admin - Full access except settings</option>
-                  <option value="moderator">Moderator - Games and notifications only</option>
-                  <option value="support">Support - Users and communications</option>
-                  <option value="super_admin">Super Admin - Complete access (use carefully)</option>
+                  <option value="admin">Admin - Full access including adding other admins</option>
+                  <option value="staff">Staff - Full access except adding other admins</option>
                 </select>
               </div>
 
@@ -2206,6 +2279,11 @@ useEffect(() => {
                       {newAdmin.permissions.settings ? 'Allowed' : 'Restricted'}
                     </span>
                   </div>
+                  {!newAdmin.permissions.settings && (
+                    <div className="text-xs text-gray-500 mt-1 pl-2">
+                      Staff cannot add other admins
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -2221,9 +2299,14 @@ useEffect(() => {
               <button
                 type="button"
                 onClick={handleAddAdmin}
-                className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                disabled={!userSearchResult}
+                className={`px-4 py-2 text-sm rounded-lg ${
+                  userSearchResult 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
               >
-                Add Admin
+                Promote to Admin
               </button>
             </div>
           </div>

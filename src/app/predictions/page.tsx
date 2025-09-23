@@ -24,7 +24,7 @@ const PredictionsPage:React.FC = () => {
     prediction: string;
     odd: string;
     result: string;
-    booking_code: {bc_id: number; betWay_code: string,sportyBet_code: string};
+    booking_code: {bc_id: number; msport_code: string,sportyBet_code: string};
 }
 type Update = {
   vip:boolean;
@@ -62,7 +62,7 @@ const [isBookingPopoverOpen, setIsBookingPopoverOpen] = useState(false);
 const bookingBtnRef = useRef<HTMLButtonElement>(null);
 // const bookingCodes = [
 //   { site: 'SportyBet', code: 'AD3S4S' },
-//   { site: 'Betway', code: '123647' },
+//   { site: 'Msport', code: '123647' },
 // ];
 type games = {
   game_id: number;
@@ -354,18 +354,18 @@ type VVIP = {
               {games.length > 0 && (
                 <div className="flex flex-col gap-2 py-2">
                   <div className="flex justify-between items-center gap-2">
-                    <span className="text-gray-700 font-medium">BetWay:</span>
-                    <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.betWay_code}</span>
+                    <span className="text-gray-700 font-medium">Msport:</span>
+                    <span className="font-mono text-blue-700 text-lg">{games[0].booking_code.msport_code}</span>
                     <button
                       onClick={() => {
-                        navigator.clipboard.writeText(games[0].booking_code.betWay_code);
-                        setCopiedCode('betway');
+                        navigator.clipboard.writeText(games[0].booking_code.msport_code);
+                        setCopiedCode('msport');
                         setTimeout(() => setCopiedCode(null), 1200);
                       }}
                       className="ml-2 p-1 rounded hover:bg-blue-100"
-                      title="Copy BetWay code"
+                      title="Copy Msport code"
                     >
-                      {copiedCode === 'betway' ? (
+                      {copiedCode === 'msport' ? (
                         <span className="text-green-600 text-xs font-semibold">Copied!</span>
                       ) : (
                         <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

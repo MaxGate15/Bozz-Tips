@@ -22,7 +22,7 @@ type Game = {
   prediction: string;
   result: string; // Added result field
   booking_code?: {
-    betWay_code: string;
+    msport_code: string;
     sportyBet_code: string;
   };
 };
@@ -101,7 +101,7 @@ const Home: React.FC = () => {
               JOIN VVIP
             </Link>
             <Link
-              href="https://t.me/+4IYlVJxd_R1iM2U0"
+              href="https://t.me/+AdZyJL_W2y8xZDg0"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white text-blue-900 px-3 py-2 sm:px-4 sm:py-3 rounded-full font-bold hover:bg-gray-100 transition-colors min-w-[100px] sm:min-w-[140px] text-center text-sm sm:text-base"
@@ -258,18 +258,18 @@ const Home: React.FC = () => {
                   {games.length > 0 && (
                     <div className="flex flex-col gap-2 py-2">
                       <div className="flex justify-between items-center gap-2">
-                        <span className="text-gray-700 font-medium">BetWay:</span>
-                        <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.betWay_code}</span>
+                        <span className="text-gray-700 font-medium">Msport:</span>
+                        <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.msport_code}</span>
                         <button
                           onClick={() => {
-                            navigator.clipboard.writeText(games[0].booking_code?.betWay_code || '');
-                            setCopiedCode('betway');
+                            navigator.clipboard.writeText(games[0].booking_code?.msport_code || '');
+                            setCopiedCode('msport');
                             setTimeout(() => setCopiedCode(null), 1200);
                           }}
                           className="ml-2 p-1 rounded hover:bg-blue-100"
-                          title="Copy BetWay code"
+                          title="Copy Msport code"
                         >
-                          {copiedCode === 'betway' ? (
+                          {copiedCode === 'msport' ? (
                             <span className="text-green-600 text-xs font-semibold">Copied!</span>
                           ) : (
                             <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

@@ -79,7 +79,7 @@ const statusColor = {
 
 type booking = {
   sportyBet_code: string;
-  betWay_code: string;}
+  msport_code: string;}
 
 type games = {
   game_id: number;
@@ -225,15 +225,15 @@ export default function VVIPGamesPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-green-700">BetWay Code:</span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
-                        {game.booking_code.betWay_code && (
+                        <span className="font-semibold text-green-700">Msport Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.msport_code || 'N/A'}</span>
+                        {game.booking_code.msport_code && (
                           <button
                             className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
                             onClick={() => {
-                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                              navigator.clipboard.writeText(game.booking_code.msport_code);
                             }}
-                            title="Copy BetWay Code"
+                            title="Copy Msport Code"
                           >
                             Copy
                           </button>
@@ -298,15 +298,15 @@ export default function VVIPGamesPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-green-700">BetWay Code:</span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
-                        {game.booking_code.betWay_code && (
+                        <span className="font-semibold text-green-700">Msport Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.msport_code || 'N/A'}</span>
+                        {game.booking_code.msport_code && (
                           <button
                             className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
                             onClick={() => {
-                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                              navigator.clipboard.writeText(game.booking_code.msport_code);
                             }}
-                            title="Copy BetWay Code"
+                            title="Copy Msport Code"
                           >
                             Copy
                           </button>
@@ -369,15 +369,15 @@ export default function VVIPGamesPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-green-700">BetWay Code:</span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
-                        {game.booking_code.betWay_code && (
+                        <span className="font-semibold text-green-700">Msport Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.msport_code || 'N/A'}</span>
+                        {game.booking_code.msport_code && (
                           <button
                             className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
                             onClick={() => {
-                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                              navigator.clipboard.writeText(game.booking_code.msport_code);
                             }}
-                            title="Copy BetWay Code"
+                            title="Copy Msport Code"
                           >
                             Copy
                           </button>
@@ -439,15 +439,15 @@ export default function VVIPGamesPage() {
                         )}
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="font-semibold text-green-700">BetWay Code:</span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.betWay_code || 'N/A'}</span>
-                        {game.booking_code.betWay_code && (
+                        <span className="font-semibold text-green-700">Msport Code:</span>
+                        <span className="bg-gray-100 px-2 py-1 rounded">{game.booking_code.msport_code || 'N/A'}</span>
+                        {game.booking_code.msport_code && (
                           <button
                             className="ml-2 px-2 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs"
                             onClick={() => {
-                              navigator.clipboard.writeText(game.booking_code.betWay_code);
+                              navigator.clipboard.writeText(game.booking_code.msport_code);
                             }}
-                            title="Copy BetWay Code"
+                            title="Copy Msport Code"
                           >
                             Copy
                           </button>
