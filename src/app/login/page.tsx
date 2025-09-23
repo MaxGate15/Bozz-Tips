@@ -26,6 +26,7 @@ export default function LoginPage() {
     try {
       const response = await axios.post('https://admin.bozz-tips.com/api/token/', userDetails);
       const { access } = response.data;
+      console.log('Access Token:', access);
   
       saveToken(access);
       saveUsername(userDetails.username); // Save username to local storage

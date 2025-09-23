@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   getUsername,
@@ -32,6 +32,7 @@ export default function Navbar() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [auth, setAuth] = useState(false);
   const  [username, setUsername] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [selectedNotif, setSelectedNotif] = useState<{
     id: number;
@@ -48,21 +49,51 @@ export default function Navbar() {
 
   const notifDropdownRef = useRef<HTMLDivElement>(null);
 
-  const checkAuth = () => {
+  const checkAdminStatus = async (username: string) => {
+    try {
+      const token = getToken();
+      const response = await fetch(`https://admin.bozz-tips.com/check-admin/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Username': username,
+          ...(token && { 'Authorization': `Bearer ${token}` }),
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsAdmin(data.is_admin || false);
+      } else {
+        setIsAdmin(false);
+      }
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
+    }
+  };
+
+  const checkAuth = useCallback(async () => {
     // Authenticated if NextAuth session exists or custom token exists
     if ((status === 'authenticated' && session) || isAuthenticated() || getToken()) {
       setAuth(true);
-      setUsername(getUsername() || session?.user?.name || 'User');
-    const username = getUsername();
-      alert(`Welcome to Bozz Tips${username ? ', ' + username : ''}!`);
+      const currentUsername = getUsername() || session?.user?.name || 'User';
+      setUsername(currentUsername);
+      
+      // Check admin status if we have a username
+      if (currentUsername && currentUsername !== 'User') {
+        await checkAdminStatus(currentUsername);
+      }
+      
     } else {
       setAuth(false);
       setUsername('');
+      setIsAdmin(false);
     }
-  };
+  }, [status, session]);
   useEffect(() => {
     checkAuth();
-  }, [pathname, status, session]);
+  }, [pathname, checkAuth]);
   
   useEffect(() => {
     if (!isNotifOpen) return;
@@ -81,6 +112,7 @@ export default function Navbar() {
     removeIsAuthenticated();
     setAuth(false);
     setUsername('');
+    setIsAdmin(false);
     window.location.href = '/login'; // Redirect after logout
   };
 
@@ -118,6 +150,9 @@ export default function Navbar() {
             <Link href="/" className="text-gray-600 hover:text-blue-900">Home</Link>
             <Link href="/predictions" className="text-gray-600 hover:text-blue-900">Predictions</Link>
             <Link href="/about" className="text-gray-600 hover:text-blue-900">About</Link>
+            {auth && isAdmin && (
+              <Link href="/admin" className="text-gray-600 hover:text-blue-900 font-semibold">Admin</Link>
+            )}
 
             {auth ? (
               <>
@@ -246,7 +281,11 @@ export default function Navbar() {
                 </span>
               </button>
             )}
-            <button className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button 
+              className="md:hidden" 
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-label="Toggle navigation menu"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 {isMenuOpen ? (
                   <path d="M6 18L18 6M6 6l12 12" />
@@ -279,6 +318,9 @@ export default function Navbar() {
               <Link href="/" className="block px-3 py-2 text-gray-600 hover:text-blue-900" onClick={() => setIsMenuOpen(false)}>Home</Link>
               <Link href="/predictions" className="block px-3 py-2 text-gray-600 hover:text-blue-900" onClick={() => setIsMenuOpen(false)}>Predictions</Link>
               <Link href="/about" className="block px-3 py-2 text-gray-600 hover:text-blue-900" onClick={() => setIsMenuOpen(false)}>About</Link>
+              {auth && isAdmin && (
+                <Link href="/admin" className="block px-3 py-2 text-gray-600 hover:text-blue-900 font-semibold" onClick={() => setIsMenuOpen(false)}>Admin</Link>
+              )}
               {auth ? (
                 <>
                   <Link href="/dashboard" className="block px-3 py-2 text-gray-600 hover:text-blue-900" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
