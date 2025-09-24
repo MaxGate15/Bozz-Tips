@@ -5,13 +5,20 @@ import { FaRegCalendarAlt, FaUsers, FaGamepad, FaBell, FaSms, FaCog, FaSignOutAl
 
 // Add types for games and slips to avoid implicit any
 type Game = {
+  id?: number | string;
+  game_id?: number | string;
+  gameId?: number | string;
   team1?: string;
   team2?: string;
   odds?: number | string;
   prediction?: string;
   category?: string;
   result?: 'Pending' | 'Won' | 'Lost' | string;
-  [key: string]: any;
+  tournament?: string;
+  sport?: string;
+  home?: string;
+  away?: string;
+  odd?: number | string;
 };
 
 type Slip = {
@@ -611,10 +618,14 @@ useEffect(() => {
       setUserSearchResult(null);
       
       // Handle different types of errors gracefully
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert('Network error: Unable to connect to server. Please check your connection and try again.');
+      if (error instanceof Error) {
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          alert('Network error: Unable to connect to server. Please check your connection and try again.');
+        } else {
+          alert(`Error searching for user: ${error.message || 'Please try again.'}`);
+        }
       } else {
-        alert(`Error searching for user: ${error.message || 'Please try again.'}`);
+        alert('Error searching for user: Please try again.');
       }
     } finally {
       setIsSearchingUser(false);
@@ -685,14 +696,18 @@ useEffect(() => {
         throw new Error(errorData.error || `HTTP ${response.status}`);
       }
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error promoting user to admin:', error);
       
       // Handle different types of errors gracefully
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        alert('Network error: Unable to connect to server. Please check your connection and try again.');
+      if (error instanceof Error) {
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          alert('Network error: Unable to connect to server. Please check your connection and try again.');
+        } else {
+          alert(`Error promoting user to admin: ${error.message || 'Please try again.'}`);
+        }
       } else {
-        alert(`Error promoting user to admin: ${error.message || 'Please try again.'}`);
+        alert('Error promoting user to admin: Please try again.');
       }
     }
   };
@@ -825,7 +840,7 @@ useEffect(() => {
       alert('Slip not found');
       return;
     }
-    const game = slip.games[gameIndex] as any;
+    const game = slip.games[gameIndex];
     if (!game) {
       alert('Game not found');
       return;
@@ -853,16 +868,20 @@ useEffect(() => {
           slip.id === slipId
             ? {
                 ...slip,
-                games: slip.games.map((g: any, idx: number) => (idx === gameIndex ? { ...g, result } : g))
+                games: slip.games.map((g, idx: number) => (idx === gameIndex ? { ...g, result } : g))
               }
             : slip
         )
       );
       setEditingGame(null);
       alert('Game result updated successfully!');
-    } catch (err: any) {
+    } catch (err) {
       console.error('Failed to update game result:', err);
-      alert(`Failed to update game result: ${err?.message || String(err)}`);
+      if (err instanceof Error) {
+        alert(`Failed to update game result: ${err.message}`);
+      } else {
+        alert(`Failed to update game result: ${String(err)}`);
+      }
     }
   };
   type Admin = {
@@ -930,9 +949,13 @@ useEffect(() => {
       setExpandedSlip(null);
       alert('Slip results have been published and are now visible to users!');
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to publish slip:', error);
-      alert(`Failed to publish slip. Please try again. ${error?.message || ''}`);
+      if (error instanceof Error) {
+        alert(`Failed to publish slip. Please try again. ${error.message}`);
+      } else {
+        alert('Failed to publish slip. Please try again.');
+      }
     }
   };
 
