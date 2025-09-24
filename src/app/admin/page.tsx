@@ -578,23 +578,44 @@ useEffect(() => {
     }
 
     setIsSearchingUser(true);
+    setUserSearchResult(null); // Clear previous results
+    
     try {
-      // Search for user in the existing users list
-      const foundUser = users.find(user => 
-        user.username.toLowerCase() === newAdmin.username.toLowerCase() ||
-        user.username.toLowerCase().replace('@', '') === newAdmin.username.toLowerCase().replace('@', '')
-      );
+      // Clean username - remove @ if present and trim
+      const cleanUsername = newAdmin.username.trim().replace(/^@/, '');
+      
+      // Call backend API
+      const response = await fetch(`https://admin.bozz-tips.com/get-user/${encodeURIComponent(cleanUsername)}/`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
 
-      if (foundUser) {
-        setUserSearchResult(foundUser);
-        alert(`User found: ${foundUser.name} (${foundUser.username})`);
-      } else {
+      if (response.ok) {
+        // User found - parse response
+        const userData = await response.json();
+        setUserSearchResult(userData);
+        alert(`User found: ${userData.name || 'N/A'} (${userData.username || cleanUsername})`);
+      } else if (response.status === 404) {
+        // User not found
         setUserSearchResult(null);
         alert('User not found. Please check the username and try again.');
+      } else {
+        // Other error statuses
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
       }
     } catch (error) {
       console.error('Error searching for user:', error);
-      alert('Error searching for user. Please try again.');
+      setUserSearchResult(null);
+      
+      // Handle different types of errors gracefully
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert('Network error: Unable to connect to server. Please check your connection and try again.');
+      } else {
+        alert(`Error searching for user: ${error.message || 'Please try again.'}`);
+      }
     } finally {
       setIsSearchingUser(false);
     }
@@ -612,46 +633,67 @@ useEffect(() => {
       return;
     }
 
-    // Use the permissions based on the selected role
-    const adminPermissions = {
-      ...newAdmin.permissions
-    };
-
     try {
-      // Here you would send the data to your backend to promote user to admin
-      const adminData = {
-        username: newAdmin.username,
-        userId: userSearchResult.id,
-        role: newAdmin.role,
-        permissions: adminPermissions
-      };
+      // Clean username - remove @ if present and trim
+      const cleanUsername = newAdmin.username.trim().replace(/^@/, '');
+      
+      // Determine is_superuser and is_staff based on role selection
+      let is_superuser = 0;
+      let is_staff = 0;
+      
+      if (newAdmin.role === 'admin') {
+        // Admin: both superuser and staff are true
+        is_superuser = 1;
+        is_staff = 1;
+      } else if (newAdmin.role === 'staff') {
+        // Staff: only staff is true, superuser is false
+        is_superuser = 0;
+        is_staff = 1;
+      }
 
-      console.log('Promoting user to admin:', adminData);
-      
-      // Simulate API call - replace with actual backend call
-      // const response = await fetch('/api/admin/promote-user', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(adminData)
-      // });
+      // Call backend API to promote user
+      const response = await fetch(`https://admin.bozz-tips.com/add-admin/${encodeURIComponent(cleanUsername)}/${is_superuser}/${is_staff}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
 
-      alert(`User ${userSearchResult.name} has been promoted to ${newAdmin.role} successfully!`);
-    
-    // Reset form
-    setNewAdmin({
-        username: '',
-      role: 'admin',
-        permissions: { games: true, users: true, notifications: true, sms: true, settings: true }
-    });
-      setUserSearchResult(null);
-    setShowAddAdminModal(false);
+      if (response.ok) {
+        // Success - parse response
+        const responseData = await response.json();
+        alert(`Success! ${responseData.message || `User ${userSearchResult.name} has been promoted to ${newAdmin.role} successfully!`}`);
+        
+        // Reset form
+        setNewAdmin({
+          username: '',
+          role: 'admin',
+          permissions: { games: true, users: true, notifications: true, sms: true, settings: true }
+        });
+        setUserSearchResult(null);
+        setShowAddAdminModal(false);
+        
+        // Optionally refresh users list if you have that functionality
+        // await fetchUsers();
+        
+      } else if (response.status === 404) {
+        // User not found
+        alert('User not found in the system. Please verify the username and try again.');
+      } else {
+        // Other error statuses
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
       
-      // Refresh users list to show updated roles
-      // await fetchUsers();
-      
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error promoting user to admin:', error);
-      alert('Error promoting user to admin. Please try again.');
+      
+      // Handle different types of errors gracefully
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        alert('Network error: Unable to connect to server. Please check your connection and try again.');
+      } else {
+        alert(`Error promoting user to admin: ${error.message || 'Please try again.'}`);
+      }
     }
   };
 
@@ -823,6 +865,32 @@ useEffect(() => {
       alert(`Failed to update game result: ${err?.message || String(err)}`);
     }
   };
+  type Admin = {
+  id: number;
+  initials: string;
+  name: string;
+  email: string;
+  role: string;
+  status: "Active" | "Inactive";
+};
+
+
+  const [admins, setAdmins] = useState<Admin[]>([]);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      try {
+        const response = await fetch("https://admin.bozz-tips.com/get-admins/");
+        const data = await response.json();
+        setAdmins(data);
+      } catch (error) {
+        console.error("Error fetching admins:", error);
+      }
+    };
+
+    fetchAdmins();
+  }, []);
+
 
   // Function to update overall slip result
   const handleUpdateSlipResult = (slipId: number, result: string) => {
@@ -878,10 +946,10 @@ useEffect(() => {
     setIsLoading(true);
     try {
       // TODO: Replace with actual SportyBet API call
-      const response = await fetch(`/api/sportybet/${bookingCode}`);
+      const response = await fetch(`https://admin.bozz-tips.com/load-booking/${bookingCode}/`);
       const data = await response.json();
       
-      if (data.success) {
+      if (data.games) {
         setLoadedGames(prev => ({
           ...prev,
           [selectedCategory]: data.games
@@ -894,6 +962,7 @@ useEffect(() => {
           ...prev,
           [selectedCategory]: bookingCode
         }));
+        console.log('Loaded games:', data.games);
       } else {
         alert('Failed to load games. Please check the booking code.');
       }
@@ -1127,7 +1196,7 @@ useEffect(() => {
                      <div>
                        <div className="text-xs text-gray-500 mb-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>{game.category}</div>
                        <div className="font-normal text-gray-900 text-sm" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-                         {game.team1} vs {game.team2}
+                         {game.team1} ss {game.team2}
                        </div>
                        <div className="text-xs text-gray-500 mt-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
                          {game.prediction}
@@ -1451,7 +1520,7 @@ useEffect(() => {
                      <div>
                        <div className="text-xs text-gray-500 mb-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>{game.category}</div>
                        <div className="font-normal text-gray-900 text-sm" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-                         {game.team1} vs {game.team2}
+                         {game.home} vs {game.away}
                        </div>
                        <div className="text-xs text-gray-500 mt-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
                          {game.prediction}
@@ -1814,44 +1883,49 @@ useEffect(() => {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admin</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th>
+                {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Active</th> */}
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              <tr>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                      AD
+            <tbody className="bg-gray-50 divide-y divide-gray-200">
+              {admins.map((admin) => (
+                <tr key={admin.id}>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center">
+                      <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                        {admin.initials}
+                      </div>
+                      <div className="ml-4">
+                        <div className="text-sm font-medium text-gray-900">{admin.name}</div>
+                        <div className="text-sm text-gray-500">{admin.email}</div>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">Admin User</div>
-                      <div className="text-sm text-gray-500">admin@bozz-tips.com</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                    Super Admin
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">2 minutes ago</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Active
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  <button className="text-blue-600 hover:text-blue-900 mr-3">
-                    <FaEdit />
-                  </button>
-                  <button className="text-red-600 hover:text-red-900">
-                    <FaTimes />
-                  </button>
-                </td>
-              </tr>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      {admin.role}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                      admin.status === 'Active' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {admin.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <button className="text-blue-600 hover:text-blue-900 mr-3">
+                      <FaEdit />
+                    </button>
+                    <button className="text-red-600 hover:text-red-900">
+                      <FaTimes />
+                    </button>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -2216,7 +2290,7 @@ useEffect(() => {
                     </div>
               <div>
                       <div className="text-sm font-medium text-gray-900">{userSearchResult.name}</div>
-                      <div className="text-sm text-gray-600">{userSearchResult.username}</div>
+                      <div className="text-sm text-gray-500">{userSearchResult.username}</div>
                       <div className="text-xs text-gray-500">{userSearchResult.email}</div>
               </div>
                   </div>
