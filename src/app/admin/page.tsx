@@ -1219,7 +1219,7 @@ useEffect(() => {
                      <div>
                        <div className="text-xs text-gray-500 mb-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>{game.category}</div>
                        <div className="font-normal text-gray-900 text-sm" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
-                         {game.team1} ss {game.team2}
+                         {game.home} vs {game.away}
                        </div>
                        <div className="text-xs text-gray-500 mt-1 font-normal" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
                          {game.prediction}
