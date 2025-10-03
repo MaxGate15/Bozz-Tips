@@ -93,8 +93,8 @@ const Home: React.FC = () => {
                   prediction: game.prediction || 'N/A',
                   result: game.result || slip.slip_result || 'pending',
                   booking_code: {
-                    msport_code: slip.msport_code || 'N/A',
-                    sportyBet_code: slip.sporty_code || 'N/A'
+                    msport_code: slip.booking_code.msport_code || 'N/A',
+                    sportyBet_code: slip.booking_code.sportyBet_code || 'N/A'
                   }
                 }));
               }).flat(); // Flatten the array since we're mapping slips to games
