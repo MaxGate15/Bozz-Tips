@@ -315,28 +315,7 @@ const Home: React.FC = () => {
                   <div className="font-bold text-blue-900 mb-2">Booking Codes</div>
                   {games.length > 0 && (
                     <div className="flex flex-col gap-2 py-2">
-                      <div className="flex justify-between items-center gap-2">
-                        <span className="text-gray-700 font-medium">Msport:</span>
-                        <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.msport_code}</span>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(games[0].booking_code?.msport_code || '');
-                            setCopiedCode('msport');
-                            setTimeout(() => setCopiedCode(null), 1200);
-                          }}
-                          className="ml-2 p-1 rounded hover:bg-blue-100"
-                          title="Copy Msport code"
-                        >
-                          {copiedCode === 'msport' ? (
-                            <span className="text-green-600 text-xs font-semibold">Copied!</span>
-                          ) : (
-                            <svg className="w-5 h-5 text-blue-700" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-                              <rect x="3" y="3" width="13" height="13" rx="2" ry="2" />
-                            </svg>
-                          )}
-                        </button>
-                      </div>
+                      
                       <div className="flex justify-between items-center gap-2">
                         <span className="text-gray-700 font-medium">SportyBet:</span>
                         <span className="font-mono text-blue-700 text-lg">{games[0].booking_code?.sportyBet_code}</span>
