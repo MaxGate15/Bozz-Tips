@@ -47,20 +47,78 @@ const Home: React.FC = () => {
   
 
   useEffect(() => {
-    if (selectedDay === 'today') {
-      setGames(today);
-    } else if (selectedDay === 'tomorrow') {
-      setGames(tomorrow);
-    } else if (selectedDay === 'yesterday') {
-      setGames(yesterday);
+    const fetchGames = async () => {
+      setGames([]); // Clear previous games
+      
+      try {
+        let url = '';
+        
+        if (selectedDay === 'today') {
+          url = 'https://admin.bozz-tips.com/today-games/';
+        } else if (selectedDay === 'tomorrow') {
+          url = 'https://admin.bozz-tips.com/tomorrow-games/';
+        } else if (selectedDay === 'yesterday') {
+          url = 'https://admin.bozz-tips.com/yesterday-games/';
+        } else if (selectedDay === 'other' && selectedDate) {
+          url = `https://admin.bozz-tips.com/other-games?formattedDate=${selectedDate}`;
+        }
+        
+        if (url) {
+          const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            
+            // Handle the response based on the endpoint
+            if (selectedDay === 'other' && data.message) {
+              // No games found for the selected date
+              setGames([]);
+            } else {
+              // Transform the data to match your Game type structure
+              const transformedGames = data.map((slip: any) => {
+                // Extract games from slip and transform them
+                const slipGames = slip.games || [];
+                return slipGames.map((game: any) => ({
+                  game_id: game.id || game.game_id || Math.random(),
+                  date_created: slip.match_day || new Date().toISOString().split('T')[0],
+                  time_created: game.time || '00:00:00',
+                  game_type: game.category || slip.category || 'Football',
+                  team1: game.team1 || game.home || 'Team 1',
+                  team2: game.team2 || game.away || 'Team 2',
+                  prediction: game.prediction || 'N/A',
+                  result: game.result || slip.slip_result || 'pending',
+                  booking_code: {
+                    msport_code: slip.msport_code || 'N/A',
+                    sportyBet_code: slip.sporty_code || 'N/A'
+                  }
+                }));
+              }).flat(); // Flatten the array since we're mapping slips to games
+              
+              setGames(transformedGames);
+            }
+          } else {
+            console.error('Failed to fetch games:', response.statusText);
+            setGames([]);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching games:', error);
+        setGames([]);
+      }
+    };
+    
+    // Only fetch from API, remove dependency on today, tomorrow, yesterday from useGames hook
+    if (selectedDay === 'today' || selectedDay === 'tomorrow' || selectedDay === 'yesterday') {
+      fetchGames();
     } else if (selectedDay === 'other' && selectedDate) {
-      // Fetch games for the selected date
-      fetch(`/api/games?date=${selectedDate}`)
-        .then(res => res.json())
-        .then(data => setGames(data))
-        .catch(() => setGames([]));
+      fetchGames();
     }
-  }, [selectedDay, today, tomorrow, yesterday, selectedDate]);
+  }, [selectedDay, selectedDate]); // Removed today, tomorrow, yesterday dependencies
 
   useEffect(() => {
     setDebugUsername(getUsername());

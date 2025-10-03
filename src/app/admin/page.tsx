@@ -536,12 +536,14 @@ useEffect(() => {
           category: (g.tournament || g.sport || g.category || '')
         }))
       };
+      // console.log("Payload to send:", payload);
 
       const res = await fetch('https://admin.bozz-tips.com/api/upload-slip/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
+
 
       if (res.status === 201) {
         // Optionally parse response and update UI
@@ -1238,7 +1240,9 @@ useEffect(() => {
                 {loadedGames[selectedCategory]?.length || 0} selections loaded
               </div>
               <div className="text-right">
-                <div className="text-lg font-normal text-gray-800" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>Total Odds: {totalOdds[selectedCategory] || 0}</div>
+                <div className="text-lg font-normal text-gray-800" style={{ fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' }}>
+                Total Odds: {totalOdds[selectedCategory] || 0}
+                </div>
                 <div className="flex gap-2 mt-2">
                     <button 
                       type="button"
