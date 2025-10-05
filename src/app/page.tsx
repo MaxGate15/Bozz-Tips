@@ -283,15 +283,15 @@ const Home: React.FC = () => {
                     </div>
                     <div className="flex flex-col items-center min-w-[60px] mt-1 sm:mt-0">
                       <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">{match.prediction}</span>
-                      <div
+                        <div
                         className={`w-3 h-3 rounded-full mt-1 ${
-                          match.result === 'won'
-                            ? 'bg-green-500'
-                            : match.result === 'lost'
-                            ? 'bg-red-500'
-                            : 'bg-yellow-300'
+                          match.result?.toLowerCase() === 'won'
+                          ? 'bg-green-500'
+                          : match.result?.toLowerCase() === 'lost'
+                          ? 'bg-red-500'
+                          : 'bg-yellow-300'
                         }`}
-                      ></div>
+                        ></div>
                     </div>
                   </div>
                 );

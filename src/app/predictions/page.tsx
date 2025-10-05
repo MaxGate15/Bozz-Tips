@@ -322,9 +322,9 @@ type VVIP = {
                     <span className="text-gray-600 text-xs sm:text-sm whitespace-nowrap">{match.prediction}</span>
                     <div
                       className={`w-3 h-3 rounded-full mt-1 ${
-                        match.result === 'won'
+                        match.result.toLowerCase() === 'won'
                           ? 'bg-green-500'
-                          : match.result === 'lost'
+                          : match.result.toLowerCase() === 'lost'
                           ? 'bg-red-500'
                           : 'bg-yellow-300'
                       }`}
